@@ -2,6 +2,9 @@
 
 open System
 open System.Reflection
+open Avalonia.Controls
+open Avalonia.FuncUI.DSL
+
 
 type ShellMag =
     |  PluginMsg of Kankasaur.PluginInterface.IPluginMsg
@@ -18,7 +21,7 @@ type ShellState = { plugins : PluginRecord list }
 let mutable plugins = []
  
 let init() =
-     AppDomain.CurrentDomain().GetAssemblies()
+     AppDomain.CurrentDomain.GetAssemblies()
      |> Array.iter ManagerRegistry.scanAssembly
      
      ManagerRegistry.getAllManagers<PluginInterface.IPlugin>()
@@ -45,7 +48,24 @@ let update (msg:ShellMag) (state:ShellState) =
           {state with plugins = newPlugins}
      | _ -> state
      
-
+let view (state:ShellState) (dispatch: obj -> unit) =
+         DockPanel.create [
+            DockPanel.children [
+                TabControl.create [
+                    TabControl.dock Dock.Top
+                    TabControl.viewItems [
+                        for pluginRec in state.plugins do
+                            TabItem.create [
+                                TabItem.header pluginRec.Name
+                                TabItem.content (
+                                    pluginRec.Instance.View pluginRec.State (fun msg ->
+                                        // dispatch (PluginMsg msg //TODO
+                                        () ))
+                            ]
+                    ]
+                ]
+            ]
+        ]
     
          
 
