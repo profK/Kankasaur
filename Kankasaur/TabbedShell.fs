@@ -39,7 +39,7 @@ let update (msg:ShellMag) (state:ShellState) =
           let newPlugins =
               plugins
               |> List.map (fun pluginRec ->
-                    let newState = pluginRec.Instance.Update pluginMsg, pluginRec.State
+                    let newState = pluginRec.Instance.Update pluginMsg pluginRec.State
                     {pluginRec with State = newState}
                 )
           {state with plugins = newPlugins}
