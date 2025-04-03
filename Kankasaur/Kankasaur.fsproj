@@ -2,15 +2,19 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="PluginInterface.fs" />
         <Compile Include="Counter.fs"/>
+        <Compile Include="TabbedShell.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>
 
-    <ItemGroup/>
+    <ItemGroup>
+      <ProjectReference Include="..\..\FSFramework\FSFramework\FSFramework.fsproj" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Avalonia.Desktop" Version="0.10.12"/>

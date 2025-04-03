@@ -1,5 +1,7 @@
 ﻿namespace Kankasaur
 
+open Avalonia.FuncUI.Types
+
 module Counter =
     open Avalonia.Controls
     open Avalonia.FuncUI.DSL
@@ -8,15 +10,15 @@ module Counter =
     type State = { count : int }
     let init = { count = 0 }
 
-    type Msg = Increment | Decrement | Reset
+    type CounterMsg = Increment | Decrement | Reset
 
-    let update (msg: Msg) (state: State) : State =
+    let update (msg: CounterMsg) (state: State) : State =
         match msg with
         | Increment -> { state with count = state.count + 1 }
         | Decrement -> { state with count = state.count - 1 }
         | Reset -> init
     
-    let view (state: State) (dispatch) =
+    let view (state: State) (dispatch: obj -> unit   ) : IView=
         DockPanel.create [
             DockPanel.children [
                 Button.create [
