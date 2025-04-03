@@ -31,7 +31,19 @@ let init() =
                                         State = Iplugin.Init()
                                     }
          )
-     |> fun pluginRecs -> {plugins = pluginRecs} 
+     |> fun pluginRecs -> {plugins = pluginRecs}
+     
+let update (msg:ShellMag) (state:ShellState) =
+     match msg with
+     | PluginMsg pluginMsg ->
+          let newPlugins =
+              plugins
+              |> List.map (fun pluginRec ->
+                    let newState = pluginRec.Instance.Update pluginMsg, pluginRec.State
+                    {pluginRec with State = newState}
+                )
+          {state with plugins = newPlugins}
+     | _ -> state
      
 
     
