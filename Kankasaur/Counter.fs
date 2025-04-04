@@ -48,6 +48,7 @@ module Counter =
                 ]
             ]
         ]
+        
     [<ManagerRegistry.Manager("Counter",
            supportedSystems.Linux|||supportedSystems.Windows|||supportedSystems.Mac)>]
     type CounterPlugin() =

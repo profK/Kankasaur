@@ -61,9 +61,9 @@ let view (state: ShellState) (dispatch) =
                             TabItem.create [
                                 TabItem.header pluginRec.Name
                                 TabItem.content (
-                                    pluginRec.Instance.View pluginRec.State (fun msg ->
-                                        // dispatch (PluginMsg msg //TODO
-                                        () ))
+                                    pluginRec.Instance.View pluginRec.State
+                                        (fun msg -> dispatch msg)
+                                         )
                             ]
                     ]
                 ]
