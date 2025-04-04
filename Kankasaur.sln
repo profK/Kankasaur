@@ -2,8 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Kankasaur", "Kankasaur\Kankasaur.fsproj", "{1D650BA3-7706-4105-B054-18CD96441955}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSFramework", "..\FSFramework\FSFramework\FSFramework\FSFramework.fsproj", "{E1F185EF-0503-423C-94E8-82D98BB29DD0}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -14,9 +12,5 @@ Global
 		{1D650BA3-7706-4105-B054-18CD96441955}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D650BA3-7706-4105-B054-18CD96441955}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1D650BA3-7706-4105-B054-18CD96441955}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E1F185EF-0503-423C-94E8-82D98BB29DD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E1F185EF-0503-423C-94E8-82D98BB29DD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E1F185EF-0503-423C-94E8-82D98BB29DD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E1F185EF-0503-423C-94E8-82D98BB29DD0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
