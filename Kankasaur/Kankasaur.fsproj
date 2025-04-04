@@ -13,7 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\FSFramework\FSFramework\FSFramework.fsproj" />
+      <ProjectReference Include="..\..\FSFramework\FSFramework\FSFramework\FSFramework.fsproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -10,20 +10,24 @@ open Avalonia.FuncUI.Elmish
 open Avalonia.Themes.Fluent
 open Avalonia.FuncUI.Hosts
 
-type MainWindow() as this =
-    inherit HostWindow()
-    do
-        base.Title <- "Kankasaur"
-        base.Width <- 400.0
-        base.Height <- 400.0
-        
-        //this.VisualRoot.VisualRoot.Renderer.DrawFps <- true
-        //this.VisualRoot.VisualRoot.Renderer.DrawDirtyRects <- true
+ type MainWindow() as this =
+        inherit HostWindow()
+        do
+            base.Title <- "Full App"
+            base.Width <- 800.0
+            base.Height <- 600.0
+            base.MinWidth <- 800.0
+            base.MinHeight <- 600.0
 
-        Elmish.Program.mkSimple (fun () -> TabbedShell.init) TabbedShell.update TabbedShell.view
-        |> Program.withHost this
-        |> Program.run
+            //this.VisualRoot.VisualRoot.Renderer.DrawFps <- true
+            //this.VisualRoot.VisualRoot.Renderer.DrawDirtyRects <- true
 
+            Elmish.Program.mkProgram
+                (fun () -> TabbedShell.init)
+                TabbedShell.update
+                TabbedShell.view
+            |> Program.withHost this
+            |> Program.run
         
 type App() =
     inherit Application()
