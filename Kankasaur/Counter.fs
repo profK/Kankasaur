@@ -21,7 +21,7 @@ module Counter =
         | Decrement -> { state with count = state.count - 1 }
         | Reset -> init
     
-    let view (state: CounterState) (dispatch: obj -> unit   ) : IView=
+    let view (state: CounterState) (dispatch: IPluginMsg -> unit   ) : IView=
         DockPanel.create [
             DockPanel.children [
                 Button.create [
@@ -58,6 +58,6 @@ module Counter =
                 let msg = msg :?> CounterMsg
                 update msg (state :?> CounterState) :> IPluginState
           
-            member this.View(state:IPluginState) (dispatch:obj -> unit) =
+            member this.View(state:IPluginState) (dispatch:(IPluginMsg -> unit)) =
                 view (state :?> CounterState) dispatch :> IView
                     

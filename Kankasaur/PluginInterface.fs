@@ -9,5 +9,5 @@ type IPluginState= interface end
 type IPlugin = 
     abstract member Init : unit -> IPluginState
     abstract member Update : IPluginMsg -> IPluginState -> IPluginState
-    abstract member View : IPluginState -> (obj -> unit) -> Types.IView
+    abstract member View : IPluginState -> (IPluginMsg -> unit) -> Types.IView
 

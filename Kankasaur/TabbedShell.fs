@@ -5,6 +5,7 @@ open System.Reflection
 open Avalonia.Controls
 open Avalonia.FuncUI.DSL
 open Elmish
+open Kankasaur.PluginInterface
 
 
 
@@ -20,7 +21,7 @@ type PluginRecord = {
     
 type ShellState = { plugins : PluginRecord list }
  
-let mutable plugins = []
+//let mutable plugins = []
  
 let init: ShellState*Cmd<obj> =
      AppDomain.CurrentDomain.GetAssemblies()
@@ -36,14 +37,16 @@ let init: ShellState*Cmd<obj> =
                                         State = Iplugin.Init()
                                     }
          )
-     |> fun pluginRecs -> {plugins = pluginRecs}, Cmd.none
+     |> fun pluginRecs ->
+         //plugins <- pluginRecs
+         {plugins = pluginRecs}, Cmd.none
      
 let update (sysmsg: obj) (state: ShellState): ShellState * Cmd<_> =
      sysmsg :?> ShellMsg
      |> function
          | PluginMsg pluginMsg ->
               let newPlugins =
-                  plugins
+                  state.plugins
                   |> List.map (fun pluginRec ->
                         let newState = pluginRec.Instance.Update pluginMsg pluginRec.State
                         {pluginRec with State = newState}
@@ -62,9 +65,11 @@ let view (state: ShellState) (dispatch) =
                                 TabItem.header pluginRec.Name
                                 TabItem.content (
                                     pluginRec.Instance.View pluginRec.State
-                                        (fun msg -> dispatch msg)
-                                         )
-                            ]
+                                            (fun (msg:IPluginMsg) ->
+                                                    dispatch ((ShellMsg.PluginMsg msg):>obj))
+                                         
+                                )
+                            ] 
                     ]
                 ]
             ]
