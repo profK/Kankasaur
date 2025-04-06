@@ -1,8 +1,10 @@
 ﻿namespace Kankasaur
 
-open Avalonia.FuncUI.Types
+open Avalonia.FuncUI
 open Kankasaur.PluginInterface
 open ManagerRegistry
+
+    
 
 module Counter =
     open Avalonia.Controls
@@ -21,7 +23,7 @@ module Counter =
         | Decrement -> { state with count = state.count - 1 }
         | Reset -> init
     
-    let view (state: CounterState) (dispatch: IPluginMsg -> unit   ) : IView=
+    let view (state: CounterState) (dispatch: IPluginMsg -> unit   ) : Types.IView=
         DockPanel.create [
             DockPanel.children [
                 Button.create [
@@ -59,5 +61,5 @@ module Counter =
                 update msg (state :?> CounterState) :> IPluginState
           
             member this.View(state:IPluginState) (dispatch:(IPluginMsg -> unit)) =
-                view (state :?> CounterState) dispatch :> IView
+                view (state :?> CounterState) dispatch :> Types.IView
                     

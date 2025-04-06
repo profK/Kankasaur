@@ -1,8 +1,9 @@
 ﻿module Kankasaur.PluginInterface
 
-open System
+open Avalonia.Controls
 open Avalonia.FuncUI
-open ManagerRegistry
+open Avalonia.FuncUI.DSL
+open Avalonia.Layout
 
 type IPluginMsg= interface end
 type IPluginState= interface end

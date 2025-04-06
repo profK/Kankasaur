@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Kankasaur", "Kankasaur\Kankasaur.fsproj", "{1D650BA3-7706-4105-B054-18CD96441955}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CounterPlugin", "CounterPlugin\CounterPlugin.fsproj", "{D29D6592-3186-4E39-930B-66E7CC96C5A0}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "KankasaurPluginSupport", "KankasaurPluginSupport\KankasaurPluginSupport.fsproj", "{A2E43C31-E0F8-4DA9-8813-5E97F04F4E3E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{1D650BA3-7706-4105-B054-18CD96441955}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D650BA3-7706-4105-B054-18CD96441955}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1D650BA3-7706-4105-B054-18CD96441955}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D29D6592-3186-4E39-930B-66E7CC96C5A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D29D6592-3186-4E39-930B-66E7CC96C5A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D29D6592-3186-4E39-930B-66E7CC96C5A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D29D6592-3186-4E39-930B-66E7CC96C5A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2E43C31-E0F8-4DA9-8813-5E97F04F4E3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2E43C31-E0F8-4DA9-8813-5E97F04F4E3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2E43C31-E0F8-4DA9-8813-5E97F04F4E3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2E43C31-E0F8-4DA9-8813-5E97F04F4E3E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

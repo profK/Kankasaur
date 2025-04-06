@@ -6,23 +6,21 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="PluginInterface.fs" />
-        <Compile Include="Counter.fs"/>
         <Compile Include="TabbedShell.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>
 
     <ItemGroup>
-    
+      <ProjectReference Include="..\CounterPlugin\CounterPlugin.fsproj" />
+      <ProjectReference Include="..\KankasaurPluginSupport\KankasaurPluginSupport.fsproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.12"/>
-        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.12"/>
+        <PackageReference Include="Avalonia" Version="0.10.12" />
+        <PackageReference Include="Avalonia.Desktop" Version="0.10.12" />
+        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.12" />
         <PackageReference Include="FSFramework" Version="1.1.0" />
-        <PackageReference Include="JaggerJo.Avalonia.FuncUI" Version="0.5.0"/>
-        <PackageReference Include="JaggerJo.Avalonia.FuncUI.DSL" Version="0.5.0"/>
-        <PackageReference Include="JaggerJo.Avalonia.FuncUI.Elmish" Version="0.5.0"/>
+        <PackageReference Include="JaggerJo.Avalonia.FuncUI.DSL" Version="0.5.0" />
     </ItemGroup>
 
     <ItemGroup>
