@@ -1,11 +1,13 @@
 ﻿module Kankasaur.TabbedShell
 
 open System
+open System.IO
 open System.Reflection
 open Avalonia.Controls
 open Avalonia.FuncUI.DSL
 open Elmish
 open Kankasaur.PluginInterface
+open System
 
 
 
@@ -24,8 +26,16 @@ type ShellState = { plugins : PluginRecord list }
 //let mutable plugins = []
  
 let init: ShellState*Cmd<obj> =
+     // Scan the current assembly for plugins
      AppDomain.CurrentDomain.GetAssemblies()
      |> Array.iter ManagerRegistry.scanAssembly
+     
+     Directory.GetFiles(".", "*.dll")
+     |> Array.iter (fun file ->
+         Assembly.LoadFrom(file)
+         |> ManagerRegistry.scanAssembly
+     )
+     
      
      ManagerRegistry.getAllManagers<PluginInterface.IPlugin>()
      |> List.map (fun Iplugin ->
