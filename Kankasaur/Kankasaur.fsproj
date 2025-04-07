@@ -11,8 +11,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\Kanka.NET\Kanka.NET\Kanka.NET.fsproj" />
       <ProjectReference Include="..\CounterPlugin\CounterPlugin.fsproj" />
       <ProjectReference Include="..\KankasaurPluginSupport\KankasaurPluginSupport.fsproj" />
+      <ProjectReference Include="..\UserPlugin\UserPlugin.fsproj" />
     </ItemGroup>
 
     <ItemGroup>

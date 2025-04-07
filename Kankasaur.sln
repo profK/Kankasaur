@@ -6,6 +6,10 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CounterPlugin", "CounterPlu
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "KankasaurPluginSupport", "KankasaurPluginSupport\KankasaurPluginSupport.fsproj", "{A2E43C31-E0F8-4DA9-8813-5E97F04F4E3E}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Kanka.NET", "..\Kanka.NET\Kanka.NET\Kanka.NET.fsproj", "{2AD93136-EE37-408C-97DA-C8C42C2B24C7}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "UserPlugin", "UserPlugin\UserPlugin.fsproj", "{A5D6A450-30A9-4746-A791-924D1E5E5D26}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +28,13 @@ Global
 		{A2E43C31-E0F8-4DA9-8813-5E97F04F4E3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2E43C31-E0F8-4DA9-8813-5E97F04F4E3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2E43C31-E0F8-4DA9-8813-5E97F04F4E3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AD93136-EE37-408C-97DA-C8C42C2B24C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AD93136-EE37-408C-97DA-C8C42C2B24C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AD93136-EE37-408C-97DA-C8C42C2B24C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AD93136-EE37-408C-97DA-C8C42C2B24C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5D6A450-30A9-4746-A791-924D1E5E5D26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5D6A450-30A9-4746-A791-924D1E5E5D26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5D6A450-30A9-4746-A791-924D1E5E5D26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5D6A450-30A9-4746-A791-924D1E5E5D26}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
