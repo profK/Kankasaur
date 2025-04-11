@@ -12,16 +12,17 @@ module Counter =
     open Avalonia.Layout
     
     type CounterState = { count : int } interface IPluginState
-    let init = { count = 0 }
+    let init =
+        ({ count = 0 } , Map.empty<string,obj>)
 
     type CounterMsg = Increment | Decrement | Reset  interface IPluginMsg
 
 
-    let update (msg: CounterMsg) (state: CounterState) :CounterState =
+    let update (msg: CounterMsg) (state: CounterState)   =
         match msg with
-        | Increment -> { state with count = state.count + 1 }
-        | Decrement -> { state with count = state.count - 1 }
-        | Reset -> init
+        | Increment -> ({ state with count = state.count + 1 }, Map.empty<string,obj>)
+        | Decrement -> ({ state with count = state.count - 1 }, Map.empty)
+        | Reset -> init 
     
     let view (state: CounterState) (dispatch: IPluginMsg -> unit   ) : Types.IView=
         DockPanel.create [
@@ -55,10 +56,15 @@ module Counter =
            supportedSystems.Linux|||supportedSystems.Windows|||supportedSystems.Mac)>]
     type CounterPlugin() =
         interface IPlugin with
-            member this.Init() = init :> IPluginState
-            member this.Update(msg:IPluginMsg) (state:IPluginState) =
+            member this.Init() =
+                init
+                |> fun tuple ->
+                    (fst tuple :> IPluginState, snd tuple)
+            member this.Update(msg:IPluginMsg) (state:IPluginState) (values:Map<string,obj>)=
                 let msg = msg :?> CounterMsg
-                update msg (state :?> CounterState) :> IPluginState
+                update msg (state :?> CounterState)
+                |> fun tuple ->
+                    (fst tuple :> IPluginState, snd tuple)
           
             member this.View(state:IPluginState) (dispatch:(IPluginMsg -> unit)) =
                 view (state :?> CounterState) dispatch :> Types.IView

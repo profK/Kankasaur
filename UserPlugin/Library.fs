@@ -42,14 +42,15 @@ module User =
                             last_campaign_id = data.GetProperty("last_campaign_id").GetInt32()
                             is_subscriber = data.GetProperty("is_subscriber").GetBoolean()
                             rate_limit = data.GetProperty("rate_limit").GetInt32()
-                       }
+                       }, Map.empty<string,obj>
 
 
     type UserMsg = Increment | Decrement | Reset  interface IPluginMsg
 
 
-    let update (msg: UserMsg) (state: UserState) :UserState =
-        state
+    let update (msg: UserMsg) (state: UserState)
+        (values:Map<string,obj>):UserState * Map<string, obj> =
+        state, Map.empty<string,obj>
     
     let view (state: UserState) (dispatch: IPluginMsg -> unit   ) : Types.IView=
         TextBox.create [
@@ -61,10 +62,17 @@ module User =
            supportedSystems.Linux|||supportedSystems.Windows|||supportedSystems.Mac)>]
     type UserPlugin() =
         interface IPlugin with
-            member this.Init() = init :> IPluginState
-            member this.Update(msg:IPluginMsg) (state:IPluginState) =
+            member this.Init() =
+                init
+                |> fun (state, map) ->
+                    state :> IPluginState, map
+            member this.Update(msg:IPluginMsg) (state:IPluginState)
+                    (values:Map<string, obj>)=
                 let msg = msg :?> UserMsg
-                update msg (state :?> UserState) :> IPluginState
+                update msg (state :?> UserState) values
+                match state, values with
+                | :? UserState as state, _ ->
+                    (state :> IPluginState, Map.empty)
           
             member this.View(state:IPluginState) (dispatch:(IPluginMsg -> unit)) =
                 view (state :?> UserState) dispatch :> Types.IView
