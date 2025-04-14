@@ -26,46 +26,52 @@ module User =
         is_subscriber: bool
         rate_limit: int } interface IPluginState
     
-    let init =
+    let init()  =
         GetProfile()
         |>fun (jel: JsonElement) ->
-                       let data = jel.GetProperty("data")
-                       {
-                            id = data.GetProperty("id").GetInt32()
-                            name = data.GetProperty("name").GetString()
-                            avatarURL = data.GetProperty("avatar").GetString()
-                            avatar_thumbURL = data.GetProperty("avatar_thumb").GetString()
-                            locale = data.GetProperty("locale").GetString()
-                            timezone = data.GetProperty("timezone").GetString()
-                            date_format = data.GetProperty("date_format").GetString()
-                            default_pagination = data.GetProperty("default_pagination").GetInt32()
-                            last_campaign_id = data.GetProperty("last_campaign_id").GetInt32()
-                            is_subscriber = data.GetProperty("is_subscriber").GetBoolean()
-                            rate_limit = data.GetProperty("rate_limit").GetInt32()
-                       }
+                      let data = jel.GetProperty("data")
+                      {
+                         id = data.GetProperty("id").GetInt32()
+                         name = data.GetProperty("name").GetString()
+                         avatarURL = data.GetProperty("avatar").GetString()
+                         avatar_thumbURL = data.GetProperty("avatar_thumb").GetString()
+                         locale = data.GetProperty("locale").GetString()
+                         timezone = data.GetProperty("timezone").GetString()
+                         date_format = data.GetProperty("date_format").GetString()
+                         default_pagination = data.GetProperty("default_pagination").GetInt32()
+                         last_campaign_id = data.GetProperty("last_campaign_id").GetInt32()
+                         is_subscriber = data.GetProperty("is_subscriber").GetBoolean()
+                         rate_limit = data.GetProperty("rate_limit").GetInt32()
+                      }
+                       
+                          
 
 
     type UserMsg = Increment | Decrement | Reset  interface IPluginMsg
 
 
-    let update (msg: UserMsg) (state: UserState) :UserState =
-        state
+    let update (msg: UserMsg) (pstate:IAppState) (state: UserState) :IAppState * UserState =
+        pstate, state
     
-    let view (state: UserState) (dispatch: IPluginMsg -> unit   ) : Types.IView=
+    let view (pState:IAppState) (state: UserState) (dispatch: IPluginMsg -> unit   ) : Types.IView=
         TextBox.create [
             TextBox.text (state.ToString())
             
         ]
         
     [<ManagerRegistry.Manager("User",
-           supportedSystems.Linux|||supportedSystems.Windows|||supportedSystems.Mac)>]
+           supportedSystems.Linux|||supportedSystems.Windows|||supportedSystems.Mac,
+            [||] , 0 )>]
     type UserPlugin() =
         interface IPlugin with
-            member this.Init() = init :> IPluginState
-            member this.Update(msg:IPluginMsg) (state:IPluginState) =
+            member this.Init()  =
+                init() :> IPluginState
+                
+            member this.Update(msg:IPluginMsg) (aState:IAppState) (pState:IPluginState) =
                 let msg = msg :?> UserMsg
-                update msg (state :?> UserState) :> IPluginState
+                let newA, newP = update msg aState (pState :?> UserState) 
+                newA, newP :> IPluginState
           
-            member this.View(state:IPluginState) (dispatch:(IPluginMsg -> unit)) =
-                view (state :?> UserState) dispatch :> Types.IView
+            member this.View (appState: IAppState) (state:IPluginState) (dispatch:(IPluginMsg -> unit)) =
+                view appState (state :?> UserState) dispatch :> Types.IView
                     

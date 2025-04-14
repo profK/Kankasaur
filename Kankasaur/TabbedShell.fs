@@ -18,34 +18,35 @@ type PluginRecord = {
      Name : string
      Instance : Kankasaur.PluginInterface.IPlugin
      State: Kankasaur.PluginInterface.IPluginState
- }
-  
-    
-type ShellState = { plugins : PluginRecord list }
+ }  
+type ShellState =
+    { plugins : PluginRecord list }
+    interface IAppState
  
-//let mutable plugins = []
+ // Must Inject Appstate
  
 let init: ShellState*Cmd<obj> =
      // Scan the current assembly for plugins
      AppDomain.CurrentDomain.GetAssemblies()
      |> Array.iter ManagerRegistry.scanAssembly
-     
+ 
      Directory.GetFiles(".", "*.dll")
      |> Array.iter (fun file ->
          Assembly.LoadFrom(file)
-         |> ManagerRegistry.scanAssembly
-     )
-     
-     
+         |> ManagerRegistry.scanAssembly )
+ 
+ 
      ManagerRegistry.getAllManagers<PluginInterface.IPlugin>()
      |> List.map (fun Iplugin ->
             Iplugin.GetType().
                     GetCustomAttribute<ManagerRegistry.Manager>()
-            |> fun attr -> {
-                                        Name = attr.Name
-                                        Instance = Iplugin
-                                        State = Iplugin.Init()
-                                    }
+            |> fun attr ->
+                let pluginState = Iplugin.Init ()
+                {
+                    Name = attr.Name
+                    Instance = Iplugin
+                    State = pluginState
+                }
          )
      |> fun pluginRecs ->
          //plugins <- pluginRecs
@@ -58,7 +59,7 @@ let update (sysmsg: obj) (state: ShellState): ShellState * Cmd<_> =
               let newPlugins =
                   state.plugins
                   |> List.map (fun pluginRec ->
-                        let newState = pluginRec.Instance.Update pluginMsg pluginRec.State
+                        let appState, newState = pluginRec.Instance.Update pluginMsg state pluginRec.State
                         {pluginRec with State = newState}
                     )
               {state with plugins = newPlugins}, Cmd.none
@@ -74,7 +75,7 @@ let view (state: ShellState) (dispatch) =
                             TabItem.create [
                                 TabItem.header pluginRec.Name
                                 TabItem.content (
-                                    pluginRec.Instance.View pluginRec.State
+                                    pluginRec.Instance.View state pluginRec.State
                                             (fun (msg:IPluginMsg) ->
                                                     dispatch ((ShellMsg.PluginMsg msg):>obj))
                                          

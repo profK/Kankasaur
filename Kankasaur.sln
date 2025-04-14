@@ -10,6 +10,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Kanka.NET", "..\Kanka.NET\K
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "UserPlugin", "UserPlugin\UserPlugin.fsproj", "{A5D6A450-30A9-4746-A791-924D1E5E5D26}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CampaignPlugin", "CampaignPlugin\CampaignPlugin.fsproj", "{B4E9A5DA-42C8-4A44-B21A-68B45EC87EB3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{A5D6A450-30A9-4746-A791-924D1E5E5D26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5D6A450-30A9-4746-A791-924D1E5E5D26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5D6A450-30A9-4746-A791-924D1E5E5D26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4E9A5DA-42C8-4A44-B21A-68B45EC87EB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4E9A5DA-42C8-4A44-B21A-68B45EC87EB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4E9A5DA-42C8-4A44-B21A-68B45EC87EB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4E9A5DA-42C8-4A44-B21A-68B45EC87EB3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
