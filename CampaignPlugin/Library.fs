@@ -48,7 +48,7 @@ module Campaign =
         ]
  
 
-    [<ManagerRegistry.Manager("User",
+    [<ManagerRegistry.Manager("Campaigns",
            supportedSystems.Linux|||supportedSystems.Windows|||supportedSystems.Mac,
             [||] , 0 )>]
    
