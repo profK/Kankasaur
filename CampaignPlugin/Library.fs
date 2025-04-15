@@ -1,5 +1,12 @@
 ﻿namespace CampaignPlugin
 
+open System.Text.Json
+open Avalonia.FuncUI
+open Avalonia.FuncUI.DSL
+open CampaignPlugin.Data
+open Kankasaur.PluginInterface
+open ManagerRegistry
+
 module Campaign =
     open Avalonia.Controls
     open Avalonia.FuncUI.DSL
@@ -9,21 +16,51 @@ module Campaign =
     open ManagerRegistry
 
     type CampaignState = {
-        Campaign: CampaignState } interface IPluginState
+        Campaigns: CampaignData seq } interface IPluginState
+    
+    type  CampaignMsg =
+        | CampaignSelected of int
+        interface IPluginMsg
 
     let init()  =
-        GetCampaign()
-        |>fun (jel: JsonElement) ->
-                      let data = jel.GetProperty("data")
-                      {
-                         id = data.GetProperty("id").GetInt32()
-                         name = data.GetProperty("name").GetString()
-                         is_private = data.GetProperty("is_private").GetBoolean()
-                         is_collaborative = data.GetProperty("is_collaborative").GetBoolean()
-                         is_admin = data.GetProperty("is_admin").GetBoolean()
-                         is_premium = data.GetProperty("is_premium").GetBoolean()
-                         is_pinned = data.GetProperty("is_pinned").GetBoolean()
-                         is_subscribed = data.GetProperty("is_subscribed").GetBoolean()
-                         is_community = data.GetProperty("is_community").GetBoolean()
-                         is_featured = data.GetProperty("is_featured").GetBoolean()
-                      }
+        
+        GetCampaigns()
+        |> fun (jel: JsonElement) ->
+                let data = jel.GetProperty("data")
+                printfn $" { data.ToString()}"
+                data.EnumerateArray()
+                |> Seq.cast<JsonElement>
+                |>Seq.map (fun campaign ->
+                     campaign
+                     |> parseCampaignData)
+                |> fun campaigns ->
+                    {
+                        Campaigns = campaigns
+                    }
+    let update (msg: CampaignMsg) (pstate:IAppState)
+                (state: CampaignState) :IAppState * CampaignState =
+                    pstate, state
+                    
+    let view (pState:IAppState) (state: CampaignState)
+        (dispatch: IPluginMsg -> unit   ) : Types.IView=
+            TextBox.create [
+                TextBox.text (state.ToString())
+        ]
+ 
+
+    [<ManagerRegistry.Manager("User",
+           supportedSystems.Linux|||supportedSystems.Windows|||supportedSystems.Mac,
+            [||] , 0 )>]
+   
+    type CampaignPlugin() =
+        interface IPlugin with
+            member this.Init()  =
+                init() :> IPluginState
+                
+            member this.Update(msg:IPluginMsg) (aState:IAppState) (pState:IPluginState) =
+                let msg = msg :?> CampaignMsg
+                let newA, newP = update msg aState (pState :?> CampaignState) 
+                newA, newP :> IPluginState
+          
+            member this.View (appState: IAppState) (state:IPluginState) (dispatch:(IPluginMsg -> unit)) =
+                view appState (state :?>CampaignState) dispatch :> Types.IView
