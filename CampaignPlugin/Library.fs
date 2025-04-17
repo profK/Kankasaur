@@ -4,7 +4,7 @@ open System.Text.Json
 open Avalonia.FuncUI
 open Avalonia.FuncUI.DSL
 open CampaignPlugin.Data
-open Kankasaur.PluginInterface
+open KankasaurPluginSupport.SharedTypes
 open ManagerRegistry
 
 module Campaign =
@@ -12,7 +12,7 @@ module Campaign =
     open Avalonia.FuncUI.DSL
     open Avalonia.Layout
     open Kanka.NET.Kanka
-    open Kankasaur.PluginInterface
+
     open ManagerRegistry
 
     type CampaignState = {
@@ -43,10 +43,17 @@ module Campaign =
                     
     let view (pState:IAppState) (state: CampaignState)
         (dispatch: IPluginMsg -> unit   ) : Types.IView=
-            TextBox.create [
-                TextBox.text (state.ToString())
-        ]
- 
+           let names =
+                (state.Campaigns)
+                |> Seq.map (
+                        fun c ->
+                            c.name)
+                         
+                 |> Seq.toList
+           ComboBox.create [
+               ComboBox.dataItems  names
+           ]
+
 
     [<ManagerRegistry.Manager("Campaigns",
            supportedSystems.Linux|||supportedSystems.Windows|||supportedSystems.Mac,

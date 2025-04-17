@@ -1,7 +1,8 @@
 ﻿namespace Kankasaur
 
 open Avalonia.FuncUI
-open Kankasaur.PluginInterface
+
+open KankasaurPluginSupport.SharedTypes
 open ManagerRegistry
 
     

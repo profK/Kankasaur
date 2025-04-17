@@ -6,24 +6,11 @@ open System.Reflection
 open Avalonia.Controls
 open Avalonia.FuncUI.DSL
 open Elmish
-open Kankasaur.PluginInterface
-open System
+open KankasaurPluginSupport.SharedTypes
 
 
-
-type ShellMsg =
-    |  PluginMsg of Kankasaur.PluginInterface.IPluginMsg
-    
-type PluginRecord = {
-     Name : string
-     Instance : Kankasaur.PluginInterface.IPlugin
-     State: Kankasaur.PluginInterface.IPluginState
- }  
-type ShellState =
-    { plugins : PluginRecord list }
-    interface IAppState
  
- // Must Inject Appstate
+
  
 let init: ShellState*Cmd<obj> =
      // Scan the current assembly for plugins
@@ -36,7 +23,7 @@ let init: ShellState*Cmd<obj> =
          |> ManagerRegistry.scanAssembly )
  
  
-     ManagerRegistry.getAllManagers<PluginInterface.IPlugin>()
+     ManagerRegistry.getAllManagers<IPlugin>()
      |> List.map (fun Iplugin ->
             Iplugin.GetType().
                     GetCustomAttribute<ManagerRegistry.Manager>()

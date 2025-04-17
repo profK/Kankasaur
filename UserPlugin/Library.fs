@@ -3,7 +3,7 @@
 open System.Text.Json
 open Avalonia.FuncUI
 open Kanka.NET.Kanka
-open Kankasaur.PluginInterface
+open KankasaurPluginSupport.SharedTypes
 open ManagerRegistry
 
     
