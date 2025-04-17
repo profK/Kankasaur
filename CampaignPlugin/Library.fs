@@ -9,15 +9,13 @@ open ManagerRegistry
 
 module Campaign =
     open Avalonia.Controls
-    open Avalonia.FuncUI.DSL
-    open Avalonia.Layout
+   
     open Kanka.NET.Kanka
+   
 
-    open ManagerRegistry
-
-    type CampaignState = {
-        Campaigns: CampaignData seq } interface IPluginState
-    
+      type CampaignState = {
+            Campaigns: CampaignData seq  } interface IPluginState
+     
     type  CampaignMsg =
         | CampaignSelected of int
         interface IPluginMsg
@@ -39,7 +37,13 @@ module Campaign =
                     }
     let update (msg: CampaignMsg) (pstate:IAppState)
                 (state: CampaignState) :IAppState * CampaignState =
-                    pstate, state
+                    match msg with
+                    | CampaignSelected index ->
+                        let selected = state.Campaigns |> Seq.toList |> List.item index
+                        printfn $"Selected campaign: {selected.name}"
+                        let campaign = state.Campaigns |> Seq.toList |> List.item index
+                        {(pstate :?> ShellState ) with campaignID = campaign.id}  , state
+                    | _ -> pstate, state
                     
     let view (pState:IAppState) (state: CampaignState)
         (dispatch: IPluginMsg -> unit   ) : Types.IView=
@@ -52,6 +56,9 @@ module Campaign =
                  |> Seq.toList
            ComboBox.create [
                ComboBox.dataItems  names
+               ComboBox.onSelectedIndexChanged (fun args ->
+                   let index = args
+                   dispatch (CampaignSelected index))
            ]
 
 

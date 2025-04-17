@@ -20,6 +20,6 @@ type PluginRecord = {
      Instance : IPlugin
      State: IPluginState
  }  
-type ShellState =
-    { plugins : PluginRecord list }
-    interface IAppState
+type ShellState = {
+     plugins : PluginRecord list
+     campaignID : int}  interface IAppState

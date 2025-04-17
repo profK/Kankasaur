@@ -37,7 +37,8 @@ let init: ShellState*Cmd<obj> =
          )
      |> fun pluginRecs ->
          //plugins <- pluginRecs
-         {plugins = pluginRecs}, Cmd.none
+         {plugins = pluginRecs
+          campaignID = 1}, Cmd.none
      
 let update (sysmsg: obj) (state: ShellState): ShellState * Cmd<_> =
      sysmsg :?> ShellMsg
