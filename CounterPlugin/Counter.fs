@@ -63,11 +63,13 @@ module  Counter=
                 let pluginState = (init appState) :> IPluginState
                 appState,  pluginState 
             member this.Update(msg:IPluginMsg) (appState:IAppState)
-                (state:IPluginState) =
-                let msg = msg :?> CounterMsg
-                let uAppState, uPluginState =
-                    update msg (appState) (state :?> CounterState)
-                (uAppState, uPluginState :> IPluginState)
+                    (state: IPluginState)=
+                match msg with
+                | :? CounterMsg as msg ->
+                    let uAppState, uPluginState =
+                        update msg (appState) (state :?> CounterState)
+                    (uAppState, uPluginState :> IPluginState)
+                | _ -> appState, state
                 
            
             member this.View appState pState (dispatch:(IPluginMsg -> unit)) =
