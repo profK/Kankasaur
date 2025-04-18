@@ -10,4 +10,9 @@
         <Compile Include="Library.fs"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\Kanka.NET\Kanka.NET\Kanka.NET.fsproj" />
+      <ProjectReference Include="..\KankasaurPluginSupport\KankasaurPluginSupport.fsproj" />
+    </ItemGroup>
+
 </Project>

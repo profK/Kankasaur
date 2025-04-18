@@ -22,23 +22,23 @@ let init: ShellState*Cmd<obj> =
          Assembly.LoadFrom(file)
          |> ManagerRegistry.scanAssembly )
  
- 
+     let  appState = {plugins = []; campaignID = 0}
      ManagerRegistry.getAllManagers<IPlugin>()
      |> List.map (fun Iplugin ->
             Iplugin.GetType().
                     GetCustomAttribute<ManagerRegistry.Manager>()
             |> fun attr ->
-                let pluginState = Iplugin.Init ()
+                let pluginState = Iplugin.Init appState
                 {
                     Name = attr.Name
                     Instance = Iplugin
-                    State = pluginState
+                    State = snd pluginState
                 }
          )
      |> fun pluginRecs ->
          //plugins <- pluginRecs
-         {plugins = pluginRecs
-          campaignID = 1}, Cmd.none
+         {   plugins = pluginRecs
+             campaignID =0 }, Cmd.none
      
 let update (sysmsg: obj) (state: ShellState): ShellState * Cmd<_> =
      sysmsg :?> ShellMsg

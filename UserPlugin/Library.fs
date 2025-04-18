@@ -64,8 +64,8 @@ module User =
             [||] , 0 )>]
     type UserPlugin() =
         interface IPlugin with
-            member this.Init()  =
-                init() :> IPluginState
+            member this.Init appState =
+                appState,  init() :> IPluginState
                 
             member this.Update(msg:IPluginMsg) (aState:IAppState) (pState:IPluginState) =
                 let msg = msg :?> UserMsg
