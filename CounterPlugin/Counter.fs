@@ -7,13 +7,13 @@ open ManagerRegistry
 
     
 
-module Counter =
+module  Counter=
     open Avalonia.Controls
     open Avalonia.FuncUI.DSL
     open Avalonia.Layout
     
     type CounterState = { count : int } interface IPluginState
-    let init ()=
+    let init  IAppState=
         { count = 0 }
 
     type CounterMsg = Increment | Decrement | Reset  interface IPluginMsg
@@ -24,7 +24,7 @@ module Counter =
         match msg with
         | Increment -> (appState, { state with count = state.count + 1 })
         | Decrement -> (appState,{ state with count = state.count - 1 } )
-        | Reset -> (appState, init () )
+        | Reset -> (appState, init appState)
     
     let view appState (state: CounterState) (dispatch: IPluginMsg -> unit   ) : Types.IView=
         DockPanel.create [
@@ -59,9 +59,9 @@ module Counter =
            [||] , 0 )>]
     type CounterPlugin() =
         interface IPlugin with
-            member this.Init (): IPluginState=
-                let pluginState = init ()
-                pluginState :> IPluginState
+            member this.Init (appState: IAppState)=
+                let pluginState = (init appState) :> IPluginState
+                appState,  pluginState 
             member this.Update(msg:IPluginMsg) (appState:IAppState)
                 (state:IPluginState) =
                 let msg = msg :?> CounterMsg
