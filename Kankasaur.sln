@@ -12,6 +12,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "UserPlugin", "UserPlugin\Us
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CampaignPlugin", "CampaignPlugin\CampaignPlugin.fsproj", "{B4E9A5DA-42C8-4A44-B21A-68B45EC87EB3}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "MapsPlugin", "MapsPlugin\MapsPlugin.fsproj", "{A3812777-C1FE-4B3A-95AD-692945657561}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{B4E9A5DA-42C8-4A44-B21A-68B45EC87EB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B4E9A5DA-42C8-4A44-B21A-68B45EC87EB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B4E9A5DA-42C8-4A44-B21A-68B45EC87EB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3812777-C1FE-4B3A-95AD-692945657561}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3812777-C1FE-4B3A-95AD-692945657561}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3812777-C1FE-4B3A-95AD-692945657561}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3812777-C1FE-4B3A-95AD-692945657561}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
