@@ -15,6 +15,7 @@
       <ProjectReference Include="..\CampaignPlugin\CampaignPlugin.fsproj" />
       <ProjectReference Include="..\CounterPlugin\CounterPlugin.fsproj" />
       <ProjectReference Include="..\KankasaurPluginSupport\KankasaurPluginSupport.fsproj" />
+      <ProjectReference Include="..\MapsPlugin\MapsPlugin.fsproj" />
       <ProjectReference Include="..\UserPlugin\UserPlugin.fsproj" />
     </ItemGroup>
 
