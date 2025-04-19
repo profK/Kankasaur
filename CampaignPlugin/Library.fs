@@ -38,12 +38,14 @@ module Campaign =
     let update (msg: CampaignMsg) (pstate:IAppState)
                 (state: CampaignState) :IAppState * CampaignState =
                     match msg with
-                    | CampaignSelected index ->
-                        let selected = state.Campaigns |> Seq.toList |> List.item index
-                        printfn $"Selected campaign: {selected.name}"
-                        let campaign = state.Campaigns |> Seq.toList |> List.item index
-                        {(pstate :?> ShellState ) with campaignID = campaign.id}  , state
-                    | _ -> pstate, state
+                    | CampaignSelected index ->                       
+                        match index with                      
+                        | index when index >= 0 ->
+                            let selected = state.Campaigns |> Seq.toList |> List.item index
+                            printfn $"Selected campaign: {selected.name}"
+                            let campaign = state.Campaigns |> Seq.toList |> List.item index
+                            {(pstate :?> ShellState ) with campaignID = campaign.id}  , state
+                        | _ -> pstate, state
                     
     let view (pState:IAppState) (state: CampaignState)
         (dispatch: IPluginMsg -> unit   ) : Types.IView=
@@ -72,9 +74,11 @@ module Campaign =
                 appState, init() :> IPluginState
                 
             member this.Update(msg:IPluginMsg) (aState:IAppState) (pState:IPluginState) =
-                let msg = msg :?> CampaignMsg
-                let newA, newP = update msg aState (pState :?> CampaignState) 
-                newA, newP :> IPluginState
+                match msg with
+                | :? CampaignMsg as msg ->
+                        let newA, newP = update msg aState (pState :?> CampaignState) 
+                        newA, newP :> IPluginState
+                | _ -> aState, pState
           
             member this.View (appState: IAppState) (state:IPluginState) (dispatch:(IPluginMsg -> unit)) =
                 view appState (state :?>CampaignState) dispatch :> Types.IView

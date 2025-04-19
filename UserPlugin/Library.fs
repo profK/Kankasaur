@@ -47,7 +47,7 @@ module User =
                           
 
 
-    type UserMsg = Increment | Decrement | Reset  interface IPluginMsg
+    type UserMsg = UserChanged  interface IPluginMsg
 
 
     let update (msg: UserMsg) (pstate:IAppState) (state: UserState) :IAppState * UserState =
@@ -68,9 +68,11 @@ module User =
                 appState,  init() :> IPluginState
                 
             member this.Update(msg:IPluginMsg) (aState:IAppState) (pState:IPluginState) =
-                let msg = msg :?> UserMsg
-                let newA, newP = update msg aState (pState :?> UserState) 
-                newA, newP :> IPluginState
+                match msg with
+                | :? UserMsg as msg->
+                    let newA, newP = update msg aState (pState :?> UserState) 
+                    newA, newP :> IPluginState
+                | _ -> aState, pState
           
             member this.View (appState: IAppState) (state:IPluginState) (dispatch:(IPluginMsg -> unit)) =
                 view appState (state :?> UserState) dispatch :> Types.IView

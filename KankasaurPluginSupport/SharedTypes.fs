@@ -14,6 +14,7 @@ type IPlugin =
 
 type ShellMsg =
     |  PluginMsg of IPluginMsg
+
     
 type PluginRecord = {
      Name : string
@@ -22,4 +23,5 @@ type PluginRecord = {
  }  
 type ShellState = {
      plugins : PluginRecord list
-     campaignID : int}  interface IAppState
+     campaignID : int
+     mapID : int } with interface IAppState

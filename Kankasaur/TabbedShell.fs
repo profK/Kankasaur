@@ -22,7 +22,7 @@ let init: ShellState*Cmd<obj> =
          Assembly.LoadFrom(file)
          |> ManagerRegistry.scanAssembly )
  
-     let  appState = {plugins = []; campaignID = 0}
+     let  appState = {plugins = []; campaignID = 0; mapID = 0}
      ManagerRegistry.getAllManagers<IPlugin>()
      |> List.map (fun Iplugin ->
             Iplugin.GetType().
@@ -38,20 +38,10 @@ let init: ShellState*Cmd<obj> =
      |> fun pluginRecs ->
          //plugins <- pluginRecs
          {   plugins = pluginRecs
-             campaignID =0 }, Cmd.none
+             campaignID =0
+             mapID = 0}, Cmd.none
      
-let update (sysmsg: obj) (state: ShellState): ShellState * Cmd<_> =
-     sysmsg :?> ShellMsg
-     |> function
-         | PluginMsg pluginMsg ->
-              let newPlugins =
-                  state.plugins
-                  |> List.map (fun pluginRec ->
-                        let appState, newState = pluginRec.Instance.Update pluginMsg state pluginRec.State
-                        {pluginRec with State = newState}
-                    )
-              {state with plugins = newPlugins}, Cmd.none
-         | _ -> state, Cmd.none
+
      
 let view (state: ShellState) (dispatch) =
          DockPanel.create [
@@ -73,6 +63,20 @@ let view (state: ShellState) (dispatch) =
                 ]
             ]
         ]
+         
+let update (sysmsg: obj) (state: ShellState): ShellState * Cmd<_> =
+     sysmsg :?> ShellMsg
+     |> function
+         | PluginMsg pluginMsg ->
+              let newPlugins =
+                  state.plugins
+                  |> List.map (fun pluginRec ->
+                        let appState, newState = pluginRec.Instance.Update pluginMsg state pluginRec.State
+                        {pluginRec with State = newState}
+                    )
+              {state with plugins = newPlugins}, Cmd.none
+         
+         | _ -> state, Cmd.none
     
          
 

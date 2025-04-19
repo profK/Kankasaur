@@ -72,10 +72,19 @@ module Maps =
                     
                 
             member this.Update(msg:IPluginMsg) (aState:IAppState) (pState:IPluginState) =
-                let msg = msg :?> MapsMsg
-                let newA, newP = update msg aState (pState :?> MapsState) 
-                newA, newP :> IPluginState
-          
+                match msg with
+                | :? MapsMsg as msg ->
+                    match msg with
+                    | MapSelected index ->
+                        match index with
+                        | i when i < 0 -> aState, pState
+                        | i when i >= 0 ->
+                            let map = (pState :?> MapsState).Maps |> Seq.toList |> List.item index
+                            {(aState :?> ShellState ) with mapID = map.id}  , pState
+                            let newA, newP = update msg aState (pState :?> MapsState) 
+                            newA, newP :> IPluginState
+                    | _ -> aState, pState
+                | _ -> aState, pState
             member this.View (appState: IAppState) (state:IPluginState) (dispatch:(IPluginMsg -> unit)) =
                 view appState (state :?> MapsState) dispatch :> Types.IView
                     
