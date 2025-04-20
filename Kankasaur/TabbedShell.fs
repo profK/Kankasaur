@@ -80,13 +80,18 @@ let update (sysmsg: obj) (state: ShellState): ShellState * Cmd<_> =
      sysmsg :?> ShellMsg
      |> function
          | PluginMsg pluginMsg ->
-              let newPlugins =
+              let newState,newPlugins =
                   state.plugins
-                  |> List.map (fun pluginRec ->
-                        let appState, newState = pluginRec.Instance.Update pluginMsg state pluginRec.State
-                        {pluginRec with State = newState}
-                    )
-              {state with plugins = newPlugins}, Cmd.none
+                  |> List.fold (fun state pluginRec ->
+                        let appState = fst state :> IAppState
+                        let pluginRecLst= snd state :> PluginRecord list
+                        let appState, newState = pluginRec.Instance.Update pluginMsg appState pluginRec.State
+                        let newlist = snd state
+                        let newPlugin = {pluginRec with State = newState}
+                        appState, newPlugin::pluginRecLst
+                        ) (state, [])
+                  
+              {(newState :?> ShellState) with plugins = newPlugins}, Cmd.none
          
          | _ -> state, Cmd.none
     
