@@ -19,51 +19,53 @@ module Maps =
     type MapsState = {
         Maps: MapRec seq } interface IPluginState
     
-    let init (appState:ShellState)  : MapsState * ShellState=
-        match appState.campaignID with
-        |  id when id <0-> { Maps = Seq.empty }, appState
-        | _ ->
-            GetMaps ("1")
-            //GetMaps (appState.campaignID.ToString())
-            |> fun (jel: JsonElement) ->
-                    printf $"{jel.ToString()}"
-                    let data = jel.GetProperty("data")
-                    printfn $" { data.ToString()}"
-                    data.EnumerateArray()
-                    |> Seq.cast<JsonElement>
-                    |>Seq.map (fun map ->
-                         map
-                         |> MakeMapRec)
-                    |> fun maps ->
-                            {  Maps = maps},  appState
-       
+    let init (appState:ShellState)  : IPluginState * ShellState=
+        let state = {
+            Maps = Seq.empty
+        } 
+        state:> IPluginState, appState 
 
     type MapsMsg =
         | MapSelected of int
         interface IPluginMsg
-
-
-    let update (msg: MapsMsg) (pstate:IAppState) (state: MapsState) :IAppState * MapsState =
-        let shellState = pstate :?> ShellState
-        GetMaps (shellState.campaignID.ToString())
-        |> fun (jel: JsonElement) ->
-                let data = jel.GetProperty("data")
-                printfn $" { data.ToString()}"
-                data.EnumerateArray()
-                |> Seq.cast<JsonElement>
-                |>Seq.map (fun map ->
-                     map
-                     |> MakeMapRec)
-                |> fun maps ->
-                        match msg with
-                        | MapSelected index ->
-                            match index with
-                            | i when i < 0 -> pstate, state
-                            | i when i >= 0 ->
-                                let map = maps |> Seq.toList |> List.item index
-                                {(pstate :?> ShellState ) with mapID = map.id}  , { state with Maps = maps }
-                        | _ -> pstate, state
     
+    let GetMapsList (jel: JsonElement) =
+        jel.GetProperty("data")
+        |> fun data ->
+            printfn $" { data.ToString()}"
+            data.EnumerateArray()
+            |> Seq.cast<JsonElement>
+            |>Seq.map (fun map ->
+                 map
+                 |> MakeMapRec)
+            
+    let update (msg: IPluginMsg) (pstate:IAppState) (state: IPluginState) :IAppState * IPluginState=
+        let shellState = pstate :?> ShellState
+        let state = state :?> MapsState
+        match shellState.campaignID with
+        | None-> pstate, state
+        | Some cid ->
+            let newShellState =
+                match msg with
+                | :? MapsMsg as mapsMsg  ->
+                    //shellState
+                    match mapsMsg with
+                    | MapSelected index ->
+                           {(pstate :?> ShellState ) with mapID = Some index}
+                    | _ -> shellState
+                | _ -> shellState
+                
+            let newMapsState=   
+                 GetMaps (cid.ToString())
+                 |> GetMapsList
+                 |> fun maps ->
+                    {
+                        Maps = maps
+                    }
+            newShellState,newMapsState :> IPluginState
+            
+                
+        
     let view (pState:IAppState) (state: MapsState) (dispatch: IPluginMsg -> unit   ) : Types.IView=
            let names =
                     (state.Maps)
@@ -96,19 +98,7 @@ module Maps =
                     
                 
             member this.Update(msg:IPluginMsg) (aState:IAppState) (pState:IPluginState) =
-                match msg with
-                | :? MapsMsg as msg ->
-                    match msg with
-                    | MapSelected index ->
-                        match index with
-                        | i when i < 0 -> aState, pState
-                        | i when i >= 0 ->
-                            let map = (pState :?> MapsState).Maps |> Seq.toList |> List.item index
-                            {(aState :?> ShellState ) with mapID = map.id}  , pState
-                            let newA, newP = update msg aState (pState :?> MapsState) 
-                            newA, newP :> IPluginState
-                    | _ -> aState, pState
-                | _ -> aState, pState
+                 update msg aState pState
             member this.View (appState: IAppState) (state:IPluginState) (dispatch:(IPluginMsg -> unit)) =
                 view appState (state :?> MapsState) dispatch :> Types.IView
                     

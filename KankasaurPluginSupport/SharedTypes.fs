@@ -23,5 +23,5 @@ type PluginRecord = {
  }  
 type ShellState = {
      plugins : PluginRecord list
-     campaignID : int
-     mapID : int } with interface IAppState
+     campaignID : int option
+     mapID : int option} with interface IAppState

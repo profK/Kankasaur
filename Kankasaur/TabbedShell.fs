@@ -23,7 +23,7 @@ let init: ShellState*Cmd<obj> =
          Assembly.LoadFrom(file)
          |> ManagerRegistry.scanAssembly )
  
-     let  appState = {plugins = []; campaignID = 0; mapID = 0}
+     let  appState = {plugins = []; campaignID = None; mapID = None}
      ManagerRegistry.getAllManagers<IPlugin>()
      |> List.sortBy (
             fun Iplugin ->
@@ -50,8 +50,8 @@ let init: ShellState*Cmd<obj> =
      |> fun pluginRecs ->
          //plugins <- pluginRecs
          {   plugins = pluginRecs
-             campaignID =0
-             mapID = 0}, Cmd.none
+             campaignID = None
+             mapID = None}, Cmd.none
      
 
      

@@ -43,10 +43,9 @@ module Campaign =
                     | CampaignSelected index ->                       
                         match index with                      
                         | index when index >= 0 ->
-                            let selected = state.Campaigns |> Seq.toList |> List.item index
-                            printfn $"Selected campaign: {selected.name}"
                             let campaign = state.Campaigns |> Seq.toList |> List.item index
-                            {(pstate :?> ShellState ) with campaignID = campaign.id}  , state
+                            printf $"Selected campaign {campaign.name}"
+                            {(pstate :?> ShellState ) with campaignID = Some campaign.id}  , state
                         | _ -> pstate, state
                     
     let view (pState:IAppState) (state: CampaignState)
