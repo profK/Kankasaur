@@ -3,6 +3,7 @@
 open System.Text.Json
 open Avalonia.FuncUI
 open Kanka.NET.Kanka
+open KankasaurPluginSupport
 open KankasaurPluginSupport.SharedTypes
 open ManagerRegistry
 
@@ -59,6 +60,7 @@ module User =
             
         ]
         
+    [<Order(1)>]
     [<ManagerRegistry.Manager("User",
            supportedSystems.Linux|||supportedSystems.Windows|||supportedSystems.Mac,
             [||] , 0 )>]

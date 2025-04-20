@@ -3,6 +3,8 @@
 open System.Text.Json
 open Avalonia.FuncUI
 open Kanka.NET.Kanka
+open KankasaurPluginSupport
+open KankasaurPluginSupport
 open KankasaurPluginSupport.SharedTypes
 open ManagerRegistry
 open MapsPlugin.Data
@@ -19,10 +21,12 @@ module Maps =
     
     let init (appState:ShellState)  : MapsState * ShellState=
         match appState.campaignID with
-        |  id when id <=0-> { Maps = Seq.empty }, appState
+        |  id when id <0-> { Maps = Seq.empty }, appState
         | _ ->
-            GetMaps (appState.campaignID.ToString())
+            GetMaps ("1")
+            //GetMaps (appState.campaignID.ToString())
             |> fun (jel: JsonElement) ->
+                    printf $"{jel.ToString()}"
                     let data = jel.GetProperty("data")
                     printfn $" { data.ToString()}"
                     data.EnumerateArray()
@@ -40,7 +44,25 @@ module Maps =
 
 
     let update (msg: MapsMsg) (pstate:IAppState) (state: MapsState) :IAppState * MapsState =
-        pstate, state
+        let shellState = pstate :?> ShellState
+        GetMaps (shellState.campaignID.ToString())
+        |> fun (jel: JsonElement) ->
+                let data = jel.GetProperty("data")
+                printfn $" { data.ToString()}"
+                data.EnumerateArray()
+                |> Seq.cast<JsonElement>
+                |>Seq.map (fun map ->
+                     map
+                     |> MakeMapRec)
+                |> fun maps ->
+                        match msg with
+                        | MapSelected index ->
+                            match index with
+                            | i when i < 0 -> pstate, state
+                            | i when i >= 0 ->
+                                let map = maps |> Seq.toList |> List.item index
+                                {(pstate :?> ShellState ) with mapID = map.id}  , { state with Maps = maps }
+                        | _ -> pstate, state
     
     let view (pState:IAppState) (state: MapsState) (dispatch: IPluginMsg -> unit   ) : Types.IView=
            let names =
@@ -58,6 +80,8 @@ module Maps =
                    dispatch (MapSelected index))
                ]
         
+    [<OrderAttribute(3)>]
+    [<AutoOpen>]
     [<ManagerRegistry.Manager("Maps",
            supportedSystems.Linux|||supportedSystems.Windows|||supportedSystems.Mac,
             [||] , 0 )>]

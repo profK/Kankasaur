@@ -5,6 +5,12 @@ open Kanka.NET.Kanka
 open KankasaurPluginSupport.SharedTypes
 open ManagerRegistry
 
+let GetProperty (data: System.Text.Json.JsonElement) (name: string) =
+    printf $"GetProperty {name}\n"
+    match data.TryGetProperty(name) with
+    | true, value -> value
+    | false, _ -> failwith $"Property {name} not found in JSON element"
+
 type LayerRec = {
         created_at: string
         created_by: int
@@ -17,7 +23,6 @@ type LayerRec = {
         layertype: string
         type_id: bool
         updated_at: string
-        updated_by: int
         visibility_id: int
         width: int}
 
@@ -53,7 +58,6 @@ type MarkerRec = {
         shape_id: int
         size_id: int
         updated_at: string
-        updated_by: int
         visibility_id: int
 }
 
@@ -66,7 +70,7 @@ type MapGroupRec = {
         name: string
         position: int
         updated_at: string
-        updated_by: int
+
         visibility_id: int
 }
 
@@ -82,61 +86,59 @@ type MapRec = {
             is_private: bool
             is_real: bool
             entity_id: int
-            tags: string list
+            //tags: string list
             created_at:  string
             created_by: int
             updated_at:  string
             updated_by: int
-            location_id: int
+
             maptype: string
             height: int
             width: int
-            map_id: int
+
             grid: int
-            min_zoom: int
-            max_zoom: int
-            initial_zoom: int
-            center_marker_id: int
-            center_x: int
-            center_y: int
+            min_zoom: float32
+            max_zoom: float32
+            initial_zoom: float32
+            
             layers: LayerRec array
             groups: MapGroupRec array
 }
 let MakeLayerRec (data: System.Text.Json.JsonElement) =
     {
-        created_at = data.GetProperty("created_at").GetString()
-        created_by = data.GetProperty("created_by").GetInt32()
-        height = data.GetProperty("height").GetInt32()
-        id = data.GetProperty("id").GetInt32()
-        is_private = data.GetProperty("is_private").GetBoolean()
-        map_id = data.GetProperty("map_id").GetInt32()
-        name = data.GetProperty("name").GetString()
-        position = data.GetProperty("position").GetInt32()
-        layertype = data.GetProperty("layertype").GetString()
-        type_id = data.GetProperty("type_id").GetBoolean()
-        updated_at = data.GetProperty("updated_at").GetString()
-        updated_by = data.GetProperty("updated_by").GetInt32()
-        visibility_id = data.GetProperty("visibility_id").GetInt32()
-        width = data.GetProperty("width").GetInt32()
+        created_at = (GetProperty data "created_at").GetString()
+        created_by = (GetProperty data "created_by").GetInt32()
+        height = (GetProperty data "height").GetInt32()
+        id = (GetProperty data "id").GetInt32() 
+        is_private = (GetProperty data "is_private").GetBoolean()
+        map_id = (GetProperty data "map_id").GetInt32()
+        name = (GetProperty data "name").GetString()
+        position = (GetProperty data "position").GetInt32()
+        layertype = (GetProperty data "type").GetString()
+        type_id = (GetProperty data "type_id").GetBoolean()
+        updated_at = (GetProperty data "updated_at").GetString()
+
+        visibility_id = (GetProperty data "visibility_id").GetInt32()
+        width = (GetProperty data "width").GetInt32()
     }
 
 let MakeGroupRec (data: System.Text.Json.JsonElement) =
     {
-        created_at = data.GetProperty("created_at").GetString()
-        created_by = data.GetProperty("created_by").GetInt32()
-        id = data.GetProperty("id").GetInt32()
-        is_private = data.GetProperty("is_private").GetBoolean()
-        map_id = data.GetProperty("map_id").GetInt32()
-        name = data.GetProperty("name").GetString()
-        position = data.GetProperty("position").GetInt32()
-        updated_at = data.GetProperty("updated_at").GetString()
-        updated_by = data.GetProperty("updated_by").GetInt32()
-        visibility_id = data.GetProperty("visibility_id").GetInt32()
+        created_at = (GetProperty data "created_at").GetString()
+        created_by = (GetProperty data "created_by").GetInt32()
+        id = (GetProperty data "id").GetInt32()
+        is_private = (GetProperty data "is_private").GetBoolean()
+        map_id = (GetProperty data "map_id").GetInt32()
+        name = (GetProperty data "name").GetString()
+        position = (GetProperty data "position").GetInt32()
+        updated_at = (GetProperty data "updated_at").GetString()
+        visibility_id = (GetProperty data "visibility_id").GetInt32()
     }
+
 let MakeMapRec (data: System.Text.Json.JsonElement) =
     {
-        id = data.GetProperty("id").GetInt32()
-        name = data.GetProperty("name").GetString()
+        id =  (GetProperty data "id").GetInt32()
+        name = (GetProperty data "name").GetString()
         entry = data.GetProperty("entry").GetString()
         entry_parsed = data.GetProperty("entry_parsed").GetString()
         image = data.GetProperty("image").GetString()
@@ -146,30 +148,27 @@ let MakeMapRec (data: System.Text.Json.JsonElement) =
         is_private = data.GetProperty("is_private").GetBoolean()
         is_real = data.GetProperty("is_real").GetBoolean()
         entity_id = data.GetProperty("entity_id").GetInt32()
-        tags =
-            let tags = data.GetProperty("tags")
-            tags.EnumerateArray() |> Seq.map (fun t -> t.ToString()) |> Seq.toList
-        created_at = data.GetProperty("created_at").GetString()
-        created_by = data.GetProperty("created_by").GetInt32()
-        updated_at = data.GetProperty("updated_at").GetString()
-        updated_by = data.GetProperty("updated_by").GetInt32()
-        location_id = data.GetProperty("location_id").GetInt32()
-        maptype = data.GetProperty("maptype").GetString()
-        height = data.GetProperty("height").GetInt32()
-        width = data.GetProperty("width").GetInt32()
-        map_id = data.GetProperty("map_id").GetInt32()
-        grid = data.GetProperty("grid").GetInt32()
-        min_zoom = data.GetProperty("min_zoom").GetInt32()
-        max_zoom = data.GetProperty("max_zoom").GetInt32()
-        initial_zoom = data.GetProperty("initial_zoom").GetInt32()
-        center_marker_id = data.GetProperty("center_marker_id").GetInt32()
-        center_x = data.GetProperty("center_x").GetInt32()
-        center_y = data.GetProperty("center_y").GetInt32()
+       // tags =
+       //     let tags = data.GetProperty("tags")
+        //    tags.EnumerateArray() |> Seq.map (fun t -> t.ToString()) |> Seq.toList
+        created_at = (GetProperty data "created_at").GetString()
+        created_by = (GetProperty data "created_by").GetInt32()
+        updated_at = (GetProperty data "updated_at").GetString()
+        updated_by = (GetProperty data "updated_by").GetInt32()
+
+        maptype = (GetProperty data "type").GetString()
+        height = (GetProperty data "height").GetInt32()
+        width = (GetProperty data "width").GetInt32()
+        grid = (GetProperty data "grid").GetInt32()
+        min_zoom = (GetProperty data "min_zoom").GetSingle()
+        max_zoom = (GetProperty data "max_zoom").GetSingle()
+        initial_zoom = (GetProperty data "initial_zoom").GetSingle()
+        
         layers =
-            data.GetProperty("layers").EnumerateArray()
+            (GetProperty data "layers").EnumerateArray()
             |> Seq.map (fun i -> MakeLayerRec  i)
             |> Seq.toArray
-        groups = data.GetProperty("groups").EnumerateArray()
+        groups = (GetProperty data "groups").EnumerateArray()
             |> Seq.map (fun g -> MakeGroupRec g)
             |> Seq.toArray
      }

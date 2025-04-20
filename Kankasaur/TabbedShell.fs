@@ -6,6 +6,7 @@ open System.Reflection
 open Avalonia.Controls
 open Avalonia.FuncUI.DSL
 open Elmish
+open KankasaurPluginSupport
 open KankasaurPluginSupport.SharedTypes
 
 
@@ -24,6 +25,17 @@ let init: ShellState*Cmd<obj> =
  
      let  appState = {plugins = []; campaignID = 0; mapID = 0}
      ManagerRegistry.getAllManagers<IPlugin>()
+     |> List.sortBy (
+            fun Iplugin ->
+                Iplugin.GetType()
+                    .GetCustomAttribute<OrderAttribute>()
+                |> Option.ofObj
+                |> function
+                    |None -> 0
+                    | Some v -> v.Order
+                
+ 
+         )
      |> List.map (fun Iplugin ->
             Iplugin.GetType().
                     GetCustomAttribute<ManagerRegistry.Manager>()

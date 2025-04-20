@@ -1,4 +1,4 @@
-﻿module KankasaurPluginSupport.SharedTypes
+﻿namespace KankasaurPluginSupport.SharedTypes
 
 open Avalonia.FuncUI
 
