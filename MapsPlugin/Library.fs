@@ -17,11 +17,13 @@ module Maps =
     open Avalonia.Layout
     
     type MapsState = {
-        Maps: MapRec seq } interface IPluginState
+        Maps: MapRec seq
+        LastCampaignID: int option} interface IPluginState
     
     let init (appState:ShellState)  : IPluginState * ShellState=
         let state = {
             Maps = Seq.empty
+            LastCampaignID = None
         } 
         state:> IPluginState, appState 
 
@@ -42,27 +44,34 @@ module Maps =
     let update (msg: IPluginMsg) (pstate:IAppState) (state: IPluginState) :IAppState * IPluginState=
         let shellState = pstate :?> ShellState
         let state = state :?> MapsState
+        
         match shellState.campaignID with
         | None-> pstate, state
         | Some cid ->
-            let newShellState =
-                match msg with
-                | :? MapsMsg as mapsMsg  ->
-                    //shellState
-                    match mapsMsg with
-                    | MapSelected index ->
-                           {(pstate :?> ShellState ) with mapID = Some index}
+            match state.LastCampaignID with
+            | None -> pstate, {state with LastCampaignID = Some cid} :> IPluginState
+            | Some lastCid when lastCid = cid -> pstate, state
+            | _ ->
+                let newShellState =
+                    match msg with
+                    | :? MapsMsg as mapsMsg  ->
+                        //shellState
+                        match mapsMsg with
+                        | MapSelected index ->
+                               {(pstate :?> ShellState ) with mapID = Some index}
+                        | _ -> shellState
                     | _ -> shellState
-                | _ -> shellState
-                
-            let newMapsState=   
-                 GetMaps (cid.ToString())
-                 |> GetMapsList
-                 |> fun maps ->
-                    {
-                        Maps = maps
-                    }
-            newShellState,newMapsState :> IPluginState
+                    
+                let newMapsState=   
+                     GetMaps (cid.ToString())
+                     |> GetMapsList
+                     |> fun maps ->
+                        {
+                            Maps = maps
+                            LastCampaignID = Some cid
+                        }
+                newShellState,newMapsState :> IPluginState
+            
             
                 
         
@@ -79,7 +88,12 @@ module Maps =
                ComboBox.dataItems  names
                ComboBox.onSelectedIndexChanged (fun args ->
                    let index = args
-                   dispatch (MapSelected index))
+                   match index with
+                   | idx when idx >= 0 ->
+                        printfn $"Selected map {names.[idx]}"
+                        dispatch (MapSelected idx)
+                     | _ -> ())
+                  
                ]
         
     [<OrderAttribute(3)>]

@@ -61,7 +61,11 @@ module Campaign =
                ComboBox.dataItems  names
                ComboBox.onSelectedIndexChanged (fun args ->
                    let index = args
-                   dispatch (CampaignSelected index))
+                   match index with
+                   | idx when idx >= 0 ->
+                       printfn $"Selected campaign {names.[idx]}"
+                       dispatch (CampaignSelected idx)
+                   | _ -> ())
            ]
 
     [<Order(2)>]

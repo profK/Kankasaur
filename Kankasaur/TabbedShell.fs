@@ -91,7 +91,8 @@ let update (sysmsg: obj) (state: ShellState): ShellState * Cmd<_> =
                         appState, newPlugin::pluginRecLst
                         ) (state, [])
                   
-              {(newState :?> ShellState) with plugins = newPlugins}, Cmd.none
+                  
+              {(newState :?> ShellState) with plugins = newPlugins |> List.rev}, Cmd.none
          
          | _ -> state, Cmd.none
     
