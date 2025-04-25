@@ -2,7 +2,7 @@
 
 open Avalonia.FuncUI
 
-type IPluginMsg= interface end
+type IPluginMsg = interface end
 type IPluginState= interface end
 type IAppState = interface end
 
@@ -14,6 +14,8 @@ type IPlugin =
 
 type ShellMsg =
     |  PluginMsg of IPluginMsg
+    | CampaignSelected of int
+    | MapSelected of int
 
     
 type PluginRecord = {

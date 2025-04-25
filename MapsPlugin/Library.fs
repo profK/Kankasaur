@@ -17,19 +17,19 @@ module Maps =
     open Avalonia.Layout
     
     type MapsState = {
-        Maps: MapRec seq
-        LastCampaignID: int option} interface IPluginState
+        Maps: MapRec seq } interface IPluginState
+      
     
     let init (appState:ShellState)  : IPluginState * ShellState=
         let state = {
             Maps = Seq.empty
-            LastCampaignID = None
+
         } 
         state:> IPluginState, appState 
 
-    type MapsMsg =
-        | MapSelected of int
-        interface IPluginMsg
+  //  type MapsMsg =
+ //       | 
+ //       interface IPluginMsg
     
     let GetMapsList (jel: JsonElement) =
         jel.GetProperty("data")
@@ -41,36 +41,26 @@ module Maps =
                  map
                  |> MakeMapRec)
             
-    let update (msg: IPluginMsg) (pstate:IAppState) (state: IPluginState) :IAppState * IPluginState=
+
+            
+    let update (msg: ShellMsg) (pstate:IAppState) (state: IPluginState) :IAppState * IPluginState=
         let shellState = pstate :?> ShellState
         let state = state :?> MapsState
-        
-        match shellState.campaignID with
-        | None-> pstate, state
-        | Some cid ->
-            match state.LastCampaignID with
-            | None -> pstate, {state with LastCampaignID = Some cid} :> IPluginState
-            | Some lastCid when lastCid = cid -> pstate, state
-            | _ ->
-                let newShellState =
-                    match msg with
-                    | :? MapsMsg as mapsMsg  ->
-                        //shellState
-                        match mapsMsg with
-                        | MapSelected index ->
-                               {(pstate :?> ShellState ) with mapID = Some index}
-                        | _ -> shellState
-                    | _ -> shellState
-                    
-                let newMapsState=   
-                     GetMaps (cid.ToString())
-                     |> GetMapsList
-                     |> fun maps ->
-                        {
-                            Maps = maps
-                            LastCampaignID = Some cid
-                        }
-                newShellState,newMapsState :> IPluginState
+        match   msg  with
+            | MapSelected index ->
+                 {shellState with
+                    mapID =
+                        state.Maps
+                         |> Seq.toArray
+                         |> fun map -> Some map.[index].id
+                  } :> IAppState, state
+            | CampaignSelected id ->
+                let maps = GetMapsList (GetMaps (id.ToString()))
+                printfn $" { maps.ToString()}"
+                {shellState with
+                    mapID = None
+                    campaignID = Some id
+                } :> IAppState, { state with Maps = maps }
             
             
                 
