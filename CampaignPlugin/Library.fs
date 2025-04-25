@@ -18,9 +18,9 @@ module Campaign =
       type CampaignState = {
             Campaigns: CampaignData seq  } interface IPluginState
      
-    type  CampaignMsg =
-        | CampaignSelected of int
-        interface IPluginMsg
+    //type  CampaignMsg =
+    //   | CampaignSelected of int
+    //    interface IPluginMsg
 
     let init()  =
         
@@ -37,19 +37,19 @@ module Campaign =
                     {
                         Campaigns = campaigns
                     }
-    let update (msg: CampaignMsg) (pstate:IAppState)
-                (state: CampaignState) :IAppState * CampaignState =
+    let update (msg: ShellMsg) (pstate:ShellState)
+                (state: CampaignState) :ShellState * CampaignState =
                     match msg with
                     | CampaignSelected index ->                       
                         match index with                      
                         | index when index >= 0 ->
                             let campaign = state.Campaigns |> Seq.toList |> List.item index
                             printf $"Selected campaign {campaign.name}"
-                            {(pstate :?> ShellState ) with campaignID = Some campaign.id}  , state
+                            {pstate  with campaignID = Some campaign.id}  , state          
                         | _ -> pstate, state
                     
-    let view (pState:IAppState) (state: CampaignState)
-        (dispatch: IPluginMsg -> unit   ) : Types.IView=
+    let view (pState:ShellState) (state: CampaignState)
+        (dispatch  ) : Types.IView=
            let names =
                 (state.Campaigns)
                 |> Seq.map (
@@ -64,7 +64,8 @@ module Campaign =
                    match index with
                    | idx when idx >= 0 ->
                        printfn $"Selected campaign {names.[idx]}"
-                       dispatch (CampaignSelected idx)
+                       let cd = state.Campaigns |> Seq.toList |> List.item index
+                       dispatch (CampaignSelected cd.id)
                    | _ -> ())
            ]
 
@@ -78,12 +79,12 @@ module Campaign =
             member this.Init appState=
                 appState, init() :> IPluginState
                 
-            member this.Update(msg:IPluginMsg) (aState:IAppState) (pState:IPluginState) =
+            member this.Update(msg:ShellMsg) (aState:ShellState) (pState:IPluginState) =
                 match msg with
-                | :? CampaignMsg as msg ->
-                        let newA, newP = update msg aState (pState :?> CampaignState) 
-                        newA, newP :> IPluginState
+                | CampaignSelected cid ->
+                      {aState  with 
+                            campaignID = Some cid}, pState
                 | _ -> aState, pState
           
-            member this.View (appState: IAppState) (state:IPluginState) (dispatch:(IPluginMsg -> unit)) =
+            member this.View (appState: ShellState) (state:IPluginState) (dispatch:(ShellMsg -> unit)) =
                 view appState (state :?>CampaignState) dispatch :> Types.IView

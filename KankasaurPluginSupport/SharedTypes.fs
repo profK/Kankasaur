@@ -4,26 +4,30 @@ open Avalonia.FuncUI
 
 type IPluginMsg = interface end
 type IPluginState= interface end
-type IAppState = interface end
 
-type IPlugin = 
-    abstract member Init : IAppState-> IAppState * IPluginState
-    abstract member Update : IPluginMsg -> IAppState -> IPluginState->
-        IAppState * IPluginState
-    abstract member View : IAppState->IPluginState -> (IPluginMsg -> unit) -> Types.IView
+
 
 type ShellMsg =
     |  PluginMsg of IPluginMsg
     | CampaignSelected of int
     | MapSelected of int
-
     
 type PluginRecord = {
      Name : string
      Instance : IPlugin
      State: IPluginState
- }  
-type ShellState = {
-     plugins : PluginRecord list
-     campaignID : int option
-     mapID : int option} with interface IAppState
+ }
+    
+and ShellState = {
+         plugins : PluginRecord list
+         campaignID : int option
+         mapID : int option}
+and  IPlugin = 
+        abstract member Init : ShellState-> ShellState* IPluginState
+        abstract member Update : ShellMsg -> ShellState -> IPluginState->
+            ShellState * IPluginState
+        abstract member View : ShellState->IPluginState -> (ShellMsg -> unit) -> Types.IView
+
+    
+   
+

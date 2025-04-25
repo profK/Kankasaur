@@ -3,11 +3,10 @@
 open System
 open System.IO
 open System.Reflection
-open Avalonia.Controls
-open Avalonia.FuncUI.DSL
 open Elmish
 open KankasaurPluginSupport
 open KankasaurPluginSupport.SharedTypes
+open Avalonia.FuncUI.DSL
 
 
  
@@ -56,25 +55,26 @@ let init: ShellState*Cmd<obj> =
 
      
 let view (state: ShellState) (dispatch) =
-         DockPanel.create [
-            DockPanel.children [
-                TabControl.create [
-                    TabControl.dock Dock.Top
-                    TabControl.viewItems [
-                        for pluginRec in state.plugins do
-                            TabItem.create [
-                                TabItem.header pluginRec.Name
-                                TabItem.content (
-                                    pluginRec.Instance.View state pluginRec.State
-                                            (fun (msg:IPluginMsg) ->
-                                                    dispatch ((ShellMsg.PluginMsg msg):>obj))
-                                         
-                                )
-                            ] 
+   DockPanel.create [
+      DockPanel.children [
+        TabControl.create [
+            TabControl.dock Dock.Top
+            TabControl.tabItems (
+                state.plugins
+                |> List.map (fun pluginRec ->
+                    TabItem.create [
+                        TabItem.header pluginRec.Name
+                        TabItem.content (
+                            pluginRec.Instance.View state pluginRec.State
+                                (fun (msg: IPluginMsg) ->
+                                    dispatch (ShellMsg.PluginMsg msg :> obj))
+                        )
                     ]
-                ]
-            ]
+                )
+            )
         ]
+    ]
+]
          
 let update (sysmsg: obj) (state: ShellState): ShellState * Cmd<_> =
      sysmsg :?> ShellMsg
@@ -83,7 +83,7 @@ let update (sysmsg: obj) (state: ShellState): ShellState * Cmd<_> =
               let newState,newPlugins =
                   state.plugins
                   |> List.fold (fun state pluginRec ->
-                        let appState = fst state :> IAppState
+                        let appState = fst state :> ShellState
                         let pluginRecLst= snd state :> PluginRecord list
                         let appState, newState = pluginRec.Instance.Update pluginMsg appState pluginRec.State
                         let newlist = snd state
@@ -92,7 +92,7 @@ let update (sysmsg: obj) (state: ShellState): ShellState * Cmd<_> =
                         ) (state, [])
                   
                   
-              {(newState :?> ShellState) with plugins = newPlugins |> List.rev}, Cmd.none
+              {newState with plugins = newPlugins |> List.rev}, Cmd.none
          
          | _ -> state, Cmd.none
     

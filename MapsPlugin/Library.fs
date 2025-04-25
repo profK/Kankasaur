@@ -43,8 +43,8 @@ module Maps =
             
 
             
-    let update (msg: ShellMsg) (pstate:IAppState) (state: IPluginState) :IAppState * IPluginState=
-        let shellState = pstate :?> ShellState
+    let update (msg: ShellMsg) (pstate:ShellState) (state: IPluginState) :ShellState * IPluginState=
+        let shellState = pstate 
         let state = state :?> MapsState
         match   msg  with
             | MapSelected index ->
@@ -53,19 +53,19 @@ module Maps =
                         state.Maps
                          |> Seq.toArray
                          |> fun map -> Some map.[index].id
-                  } :> IAppState, state
+                  } :> ShellState, state
             | CampaignSelected id ->
                 let maps = GetMapsList (GetMaps (id.ToString()))
                 printfn $" { maps.ToString()}"
                 {shellState with
                     mapID = None
                     campaignID = Some id
-                } :> IAppState, { state with Maps = maps }
+                } :> ShellState, { state with Maps = maps }
             
             
                 
         
-    let view (pState:IAppState) (state: MapsState) (dispatch: IPluginMsg -> unit   ) : Types.IView=
+    let view (pState:ShellState) (state: MapsState) (dispatch   ) : Types.IView=
            let names =
                     (state.Maps)
                      |> Seq.map (
@@ -93,16 +93,16 @@ module Maps =
             [||] , 0 )>]
     type MapsPlugin() =
         interface IPlugin with
-            member this.Init (appState:IAppState  )  : IAppState * IPluginState    =
-                init (appState :?> ShellState)
+            member this.Init (appState:ShellState  )  : ShellState * IPluginState    =
+                init (appState)
                 |> fun tpl ->
                         let state =( fst tpl) :> IPluginState
-                        let appState =snd tpl :> IAppState
+                        let appState =snd tpl :> ShellState
                         appState, state
                     
                 
-            member this.Update(msg:IPluginMsg) (aState:IAppState) (pState:IPluginState) =
+            member this.Update(msg:ShellMsg) (aState:ShellState) (pState:IPluginState) =
                  update msg aState pState
-            member this.View (appState: IAppState) (state:IPluginState) (dispatch:(IPluginMsg -> unit)) =
+            member this.View (appState: ShellState) (state:IPluginState) (dispatch:(ShellMsg -> unit)) =
                 view appState (state :?> MapsState) dispatch :> Types.IView
                     
