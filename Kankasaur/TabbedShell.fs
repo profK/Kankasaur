@@ -76,20 +76,17 @@ let view (state: ShellState) (dispatch) =
     ]
 ]
          
-let update (sysmsg: obj) (state: ShellState): ShellState * Cmd<_> =
-     sysmsg :?> ShellMsg
-     |> function
-         | PluginMsg pluginMsg ->
-              let newState,newPlugins =
-                  state.plugins
-                  |> List.fold (fun state pluginRec ->
-                        let appState = fst state :> ShellState
-                        let pluginRecLst= snd state :> PluginRecord list
-                        let appState, newState = pluginRec.Instance.Update pluginMsg appState pluginRec.State
-                        let newlist = snd state
-                        let newPlugin = {pluginRec with State = newState}
-                        appState, newPlugin::pluginRecLst
-                        ) (state, [])
+let update msg: ShellMsg) (state: ShellState): ShellState * Cmd<_> =
+      let newState,newPlugins =
+              state.plugins
+              |> List.fold (fun state pluginRec ->
+                    let appState = fst state :> ShellState
+                    let pluginRecLst= 
+                    let appState, newState = pluginRec.Instance.Update pluginMsg appState pluginRec.State
+                    let newlist = snd state
+                    let newPlugin = {pluginRec with State = newState}
+                    appState, newPlugin::pluginRecLst
+                    ) (state, [])
                   
                   
               {newState with plugins = newPlugins |> List.rev}, Cmd.none
