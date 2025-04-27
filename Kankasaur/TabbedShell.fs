@@ -7,6 +7,8 @@ open Elmish
 open KankasaurPluginSupport
 open KankasaurPluginSupport.SharedTypes
 open Avalonia.FuncUI.DSL
+open Avalonia.Controls
+
 
 
  
@@ -55,19 +57,20 @@ let init: ShellState*Cmd<obj> =
 
      
 let view (state: ShellState) (dispatch) =
+   
    DockPanel.create [
       DockPanel.children [
         TabControl.create [
             TabControl.dock Dock.Top
-            TabControl.tabItems (
+            TabControl.viewItems (
                 state.plugins
                 |> List.map (fun pluginRec ->
                     TabItem.create [
                         TabItem.header pluginRec.Name
                         TabItem.content (
                             pluginRec.Instance.View state pluginRec.State
-                                (fun (msg: IPluginMsg) ->
-                                    dispatch (ShellMsg.PluginMsg msg :> obj))
+                                (fun (msg: obj) ->
+                                    dispatch (msg :> obj))
                         )
                     ]
                 )
@@ -76,22 +79,29 @@ let view (state: ShellState) (dispatch) =
     ]
 ]
          
-let update msg: ShellMsg) (state: ShellState): ShellState * Cmd<_> =
-      let newState,newPlugins =
-              state.plugins
-              |> List.fold (fun state pluginRec ->
-                    let appState = fst state :> ShellState
-                    let pluginRecLst= 
-                    let appState, newState = pluginRec.Instance.Update pluginMsg appState pluginRec.State
-                    let newlist = snd state
-                    let newPlugin = {pluginRec with State = newState}
-                    appState, newPlugin::pluginRecLst
-                    ) (state, [])
-                  
-                  
-              {newState with plugins = newPlugins |> List.rev}, Cmd.none
+let update (msg: obj) (state: ShellState): ShellState * Cmd<_> =
+
+    match msg with
+    | :? ShellMsg as shellMsg ->
+        // Handle plugin messages
+        let newState, newPlugins =
+            state.plugins
+            |> List.fold (fun state pluginRec ->
+                let appState = fst state :> ShellState
+                let pluginRecList = snd state
+                let appState, newState = pluginRec.Instance.Update shellMsg appState pluginRec.State
+                let newlist = snd state
+                let newPlugin = {pluginRec with State = newState}
+                appState, newPlugin::pluginRecList
+                ) (state, [])
+        //printfn "Plugins after update %A" newPlugins
+        {newState with plugins = (newPlugins |> List.rev)}, Cmd.none
+    | _ ->      
+        // Handle other messages
+        printfn "Unhandled message: %A" msg
+        state, Cmd.none
          
-         | _ -> state, Cmd.none
+        
     
          
 

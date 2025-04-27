@@ -38,15 +38,16 @@ module Campaign =
                         Campaigns = campaigns
                     }
     let update (msg: ShellMsg) (pstate:ShellState)
-                (state: CampaignState) :ShellState * CampaignState =
+                (state: CampaignState) :ShellState * IPluginState =
                     match msg with
-                    | CampaignSelected index ->                       
-                        match index with                      
-                        | index when index >= 0 ->
-                            let campaign = state.Campaigns |> Seq.toList |> List.item index
+                    | CampaignSelected idx ->
+                        match idx with                      
+                        | idx when idx >= 0 ->
+                            let campaign = state.Campaigns |> Seq.toList |> List.item idx
                             printf $"Selected campaign {campaign.name}"
                             {pstate  with campaignID = Some campaign.id}  , state          
-                        | _ -> pstate, state
+                        | _ -> pstate, state :>IPluginState
+                    | _ -> pstate, state :>IPluginState
                     
     let view (pState:ShellState) (state: CampaignState)
         (dispatch  ) : Types.IView=
@@ -63,9 +64,7 @@ module Campaign =
                    let index = args
                    match index with
                    | idx when idx >= 0 ->
-                       printfn $"Selected campaign {names.[idx]}"
-                       let cd = state.Campaigns |> Seq.toList |> List.item index
-                       dispatch (CampaignSelected cd.id)
+                       dispatch (CampaignSelected idx)
                    | _ -> ())
            ]
 
@@ -80,11 +79,7 @@ module Campaign =
                 appState, init() :> IPluginState
                 
             member this.Update(msg:ShellMsg) (aState:ShellState) (pState:IPluginState) =
-                match msg with
-                | CampaignSelected cid ->
-                      {aState  with 
-                            campaignID = Some cid}, pState
-                | _ -> aState, pState
+                update msg aState (pState :?> CampaignState)
           
-            member this.View (appState: ShellState) (state:IPluginState) (dispatch:(ShellMsg -> unit)) =
+            member this.View (appState: ShellState) (state:IPluginState) (dispatch:(obj -> unit)) =
                 view appState (state :?>CampaignState) dispatch :> Types.IView

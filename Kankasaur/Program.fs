@@ -1,5 +1,6 @@
 ﻿namespace Kankasaur
 
+open Avalonia.Themes.Fluent
 open Elmish
 open Avalonia
 open Avalonia.Controls.ApplicationLifetimes
@@ -7,7 +8,6 @@ open Avalonia.Diagnostics
 open Avalonia.Input
 open Avalonia.FuncUI
 open Avalonia.FuncUI.Elmish
-open Avalonia.Themes.Fluent
 open Avalonia.FuncUI.Hosts
 
  type MainWindow() as this =
@@ -33,7 +33,9 @@ type App() =
     inherit Application()
 
     override this.Initialize() =
-        this.Styles.Add (FluentTheme(baseUri = null, Mode = FluentThemeMode.Dark))
+        let theme =FluentTheme()
+        //theme.Mode<- FluentThemeMode.Dark
+        this.Styles.Add (theme)
 
     override this.OnFrameworkInitializationCompleted() =
         match this.ApplicationLifetime with

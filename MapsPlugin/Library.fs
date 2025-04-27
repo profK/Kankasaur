@@ -17,13 +17,12 @@ module Maps =
     open Avalonia.Layout
     
     type MapsState = {
-        Maps: MapRec seq } interface IPluginState
+        Maps: MapRec list } interface IPluginState
       
     
     let init (appState:ShellState)  : IPluginState * ShellState=
         let state = {
-            Maps = Seq.empty
-
+            Maps = List.empty
         } 
         state:> IPluginState, appState 
 
@@ -48,24 +47,30 @@ module Maps =
         let state = state :?> MapsState
         match   msg  with
             | MapSelected index ->
+                 printfn $"Num Maps (update) {state.Maps |> Seq.length}"
                  {shellState with
                     mapID =
                         state.Maps
-                         |> Seq.toArray
-                         |> fun map -> Some map.[index].id
+                        |> Seq.toArray
+                        |> fun map -> Some map.[index].id
                   } :> ShellState, state
-            | CampaignSelected id ->
-                let maps = GetMapsList (GetMaps (id.ToString()))
-                printfn $" { maps.ToString()}"
+            | CampaignSelected idx ->
+                let cid = pstate.campaignID
+                let maps =
+                    match cid with
+                    |Some id ->GetMapsList (GetMaps (id.ToString())) |> Seq.toList
+                    |None ->
+                        printfn $"No campaign selected"
+                        List.empty
                 {shellState with
                     mapID = None
-                    campaignID = Some id
                 } :> ShellState, { state with Maps = maps }
             
             
                 
         
     let view (pState:ShellState) (state: MapsState) (dispatch   ) : Types.IView=
+           //printfn $"Maps Count view {state.Maps |> Seq.length}"
            let names =
                     (state.Maps)
                      |> Seq.map (
@@ -77,12 +82,16 @@ module Maps =
            ComboBox.create [
                ComboBox.dataItems  names
                ComboBox.onSelectedIndexChanged (fun args ->
+                   printfn $"Maps Count (view) {state.Maps |> Seq.length}"
                    let index = args
                    match index with
-                   | idx when idx >= 0 ->
-                        printfn $"Selected map {names.[idx]}"
-                        dispatch (MapSelected idx)
-                     | _ -> ())
+                   | index when index >= 0 ->
+                            //printfn $"Selected map {names.[index]}"
+                            //let mid = state.Maps |> Seq.toList |> List.item index
+                            dispatch (MapSelected index)
+                       | _ -> printfn "Invalid index value"
+                   | _ -> printfn $"Index {index} greater then maps count {state.Maps |> Seq.length}"
+                   )
                   
                ]
         
@@ -103,6 +112,6 @@ module Maps =
                 
             member this.Update(msg:ShellMsg) (aState:ShellState) (pState:IPluginState) =
                  update msg aState pState
-            member this.View (appState: ShellState) (state:IPluginState) (dispatch:(ShellMsg -> unit)) =
+            member this.View (appState: ShellState) (state:IPluginState) (dispatch:(obj -> unit)) =
                 view appState (state :?> MapsState) dispatch :> Types.IView
                     

@@ -88,13 +88,13 @@ type MapRec = {
             entity_id: int
             //tags: string list
             created_at:  string
-            created_by: int
+            //created_by: int
             updated_at:  string
-            updated_by: int
+            //updated_by: int
 
             maptype: string
-            height: int
-            width: int
+           // height: int
+           // width: int
 
             grid: int
             min_zoom: float32
@@ -152,13 +152,13 @@ let MakeMapRec (data: System.Text.Json.JsonElement) =
        //     let tags = data.GetProperty("tags")
         //    tags.EnumerateArray() |> Seq.map (fun t -> t.ToString()) |> Seq.toList
         created_at = (GetProperty data "created_at").GetString()
-        created_by = (GetProperty data "created_by").GetInt32()
+       // created_by = (GetProperty data "created_by").GetInt32()
         updated_at = (GetProperty data "updated_at").GetString()
-        updated_by = (GetProperty data "updated_by").GetInt32()
+       // updated_by = (GetProperty data "updated_by").GetInt32()
 
         maptype = (GetProperty data "type").GetString()
-        height = (GetProperty data "height").GetInt32()
-        width = (GetProperty data "width").GetInt32()
+       // height = (GetProperty data "height").GetInt32()
+       // width = (GetProperty data "width").GetInt32()
         grid = (GetProperty data "grid").GetInt32()
         min_zoom = (GetProperty data "min_zoom").GetSingle()
         max_zoom = (GetProperty data "max_zoom").GetSingle()

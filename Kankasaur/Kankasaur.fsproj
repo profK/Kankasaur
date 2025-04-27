@@ -18,6 +18,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.0-rc1" />
+        <PackageReference Include="Avalonia.Skia" Version="11.3.0-rc1" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.0-rc1" />
         <PackageReference Include="FSFramework" Version="2.0.1" />
     </ItemGroup>
 

@@ -26,7 +26,7 @@ and  IPlugin =
         abstract member Init : ShellState-> ShellState* IPluginState
         abstract member Update : ShellMsg -> ShellState -> IPluginState->
             ShellState * IPluginState
-        abstract member View : ShellState->IPluginState -> (ShellMsg -> unit) -> Types.IView
+        abstract member View : ShellState->IPluginState -> (obj -> unit) -> Types.IView
 
     
    
