@@ -1,8 +1,10 @@
 ﻿namespace MapsPlugin
 
+open System
 open System.Text.Json
 open Avalonia.FuncUI
 open Avalonia.FuncUI.DSL
+open Avalonia.Media
 open Avalonia.Media.Imaging
 open Kanka.NET.Kanka
 open KankasaurPluginSupport
@@ -84,27 +86,45 @@ module Maps =
                          fun c ->
                              c.name)                      
                  |> Seq.toList
-       DockPanel.create [
-            DockPanel.lastChildFill true
-            DockPanel.children [
-                Grid.create [
-                    Grid.horizontalAlignment HorizontalAlignment.Center
-                    Grid.verticalAlignment VerticalAlignment.Center
-                    Grid.children [
+       Grid.create [
+        Grid.children [
+            // ScrollViewer that contains the image
+            ScrollViewer.create [
+                ScrollViewer.content (
+                    Image.create [
                         match state.CurrentMapImg with
-                        | None ->
-                            Button.create [
-                                Button.content "Load Image"
-                                Button.onClick (fun _ -> dispatch LoadImage)
-                            ]
-                        | Some bmp ->
-                            Image.create [
-                                Image.source bmp
-                            ]
+                        | Some img -> Image.source img
+                        | None -> ()
+                        Image.stretch Avalonia.Media.Stretch.Uniform
                     ]
-                ]
-          
-                ComboBox.create [
+                )
+            ]
+
+            // ComboBox overlaid at the top left
+            ComboBox.create [
+                ComboBox.dataItems names
+                
+                ComboBox.onSelectedIndexChanged(fun args ->
+                       printfn $"Maps Count (view) {state.Maps |> Seq.length}"
+                       let index = args 
+                       match index with
+                       | index when index >= 0 ->
+                            //printfn $"Selected map {names.[index]}"
+                            //let mid = state.Maps |> Seq.toList |> List.item index
+                            dispatch (LoadImage)
+                       | _ -> printfn "Invalid index value")
+                Grid.row 0
+                Grid.column 0
+                // Use Margin to place it a little bit away from top/left
+                ComboBox.margin (10.0, 10.0, 0.0, 0.0)
+                // Floating in the grid
+                Panel.zIndex 1
+                // Optional: Small width
+                ComboBox.width 150.0
+            ]
+        ]
+    ] 
+ (*ComboBox.create [
                    ComboBox.dataItems  names
                    ComboBox.onSelectedIndexChanged (fun args ->
                        printfn $"Maps Count (view) {state.Maps |> Seq.length}"
@@ -116,11 +136,9 @@ module Maps =
                             dispatch (LoadImage)
                        | _ -> printfn "Invalid index value"
                    )
-               ]
-            ]
-       ] :> Types.IView      
-           
-        
+               ]*)               
+                
+                   
     [<OrderAttribute(3)>]
     [<AutoOpen>]
     [<ManagerRegistry.Manager("Maps",
