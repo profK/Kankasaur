@@ -38,16 +38,16 @@ module Campaign =
                         Campaigns = campaigns
                     }
     let update (msg: ShellMsg) (pstate:ShellState)
-                (state: CampaignState) :ShellState * IPluginState =
+                (state: CampaignState) :ShellState * IPluginState * ShellMsg option =
                     match msg with
                     | CampaignSelected idx ->
                         match idx with                      
                         | idx when idx >= 0 ->
                             let campaign = state.Campaigns |> Seq.toList |> List.item idx
                             printf $"Selected campaign {campaign.name}"
-                            {pstate  with campaignID = Some campaign.id}  , state          
-                        | _ -> pstate, state :>IPluginState
-                    | _ -> pstate, state :>IPluginState
+                            {pstate  with campaignID = Some campaign.id}  , state , None        
+                        | _ -> pstate, state :>IPluginState , None
+                    | _ -> pstate, state :>IPluginState,  None
                     
     let view (pState:ShellState) (state: CampaignState)
         (dispatch  ) : Types.IView=

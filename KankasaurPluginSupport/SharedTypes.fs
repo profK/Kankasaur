@@ -1,6 +1,10 @@
 ﻿namespace KankasaurPluginSupport.SharedTypes
 
+open Elmish
 open Avalonia.FuncUI
+
+
+
 
 type IPluginMsg = interface end
 type IPluginState= interface end
@@ -25,7 +29,7 @@ and ShellState = {
 and  IPlugin = 
         abstract member Init : ShellState-> ShellState* IPluginState
         abstract member Update : ShellMsg -> ShellState -> IPluginState->
-            ShellState * IPluginState
+            ShellState * IPluginState *ShellMsg option
         abstract member View : ShellState->IPluginState -> (obj -> unit) -> Types.IView
 
     

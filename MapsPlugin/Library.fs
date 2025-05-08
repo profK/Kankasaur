@@ -1,6 +1,6 @@
 ﻿namespace MapsPlugin
 
-open System
+open Elmish
 open System.Text.Json
 open Avalonia.FuncUI
 open Avalonia.FuncUI.DSL
@@ -51,18 +51,18 @@ module Maps =
             
 
             
-    let update (msg: ShellMsg) (pstate:ShellState) (state: IPluginState) :ShellState * IPluginState=
+    let update (msg: ShellMsg) (pstate:ShellState) (state: IPluginState) :ShellState * IPluginState * ShellMsg option=
         let shellState = pstate 
         let state = state :?> MapsState
         match   msg  with
             | MapSelected index ->
                  printfn $"Num Maps (update) {state.Maps |> Seq.length}"
-                 {shellState with
+                 {shellState with 
                     mapID =
                         state.Maps
                         |> Seq.toArray
                         |> fun map -> Some map.[index].id
-                  } :> ShellState, state
+                  } :> ShellState, state,  None
             | CampaignSelected idx ->
                 let cid = pstate.campaignID
                 let maps =
@@ -73,7 +73,7 @@ module Maps =
                         List.empty
                 {shellState with
                     mapID = None
-                } :> ShellState, { state with Maps = maps }
+                } :> ShellState, { state with Maps = maps },  None
             
             
                 
@@ -155,7 +155,7 @@ module Maps =
                     
                 
             member this.Update(msg:ShellMsg) (aState:ShellState) (pState:IPluginState) =
-                 update msg aState pState
+                 update msg aState pState  
             member this.View (appState: ShellState) (state:IPluginState) (dispatch:(obj -> unit)) =
                 view appState (state :?> MapsState) dispatch :> Types.IView
                     
