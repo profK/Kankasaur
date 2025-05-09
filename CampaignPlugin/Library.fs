@@ -2,6 +2,7 @@
 
 open System
 open System.Text.Json
+open Elmish
 open Avalonia.FuncUI
 open Avalonia.FuncUI.DSL
 open CampaignPlugin.Data
@@ -38,7 +39,7 @@ module Campaign =
                         Campaigns = campaigns
                     }
     let update (msg: ShellMsg) (pstate:ShellState)
-                (state: CampaignState) :ShellState * IPluginState * ShellMsg option =
+                (state: CampaignState) :ShellState * IPluginState * Cmd<obj> option =
                     match msg with
                     | CampaignSelected idx ->
                         match idx with                      

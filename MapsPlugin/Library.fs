@@ -1,14 +1,17 @@
 ﻿namespace MapsPlugin
 
-open Elmish
+open System.Net.Http
+open System.Threading.Tasks
+
 open System.Text.Json
+open Elmish
 open Avalonia.FuncUI
 open Avalonia.FuncUI.DSL
 open Avalonia.Media
 open Avalonia.Media.Imaging
 open Kanka.NET.Kanka
 open KankasaurPluginSupport
-open KankasaurPluginSupport
+
 open KankasaurPluginSupport.SharedTypes
 open ManagerRegistry
 open MapsPlugin.Data
@@ -21,18 +24,22 @@ module Maps =
     open Avalonia.Layout
     
     type MapsState = {
+        Owner: int option
         Maps: MapRec list
         CurrentMapImg : Bitmap option} interface IPluginState
      
     type MapsMsg =
-        | LoadImage
+        | LoadImage of string
+        | ImageLoaded of Bitmap
+        | ImageLoadFailed of string
         interface IPluginMsg
     
     let init (appState:ShellState)  : IPluginState * ShellState=
         let state = {
             Maps = List.empty
             CurrentMapImg = None
-        } 
+            Owner = Some 0
+        }
         state:> IPluginState, appState 
 
   //  type MapsMsg =
@@ -50,41 +57,78 @@ module Maps =
                  |> MakeMapRec)
             
 
-            
-    let update (msg: ShellMsg) (pstate:ShellState) (state: IPluginState) :ShellState * IPluginState * ShellMsg option=
-        let shellState = pstate 
-        let state = state :?> MapsState
-        match   msg  with
-            | MapSelected index ->
-                 printfn $"Num Maps (update) {state.Maps |> Seq.length}"
-                 {shellState with 
-                    mapID =
-                        state.Maps
-                        |> Seq.toArray
-                        |> fun map -> Some map.[index].id
-                  } :> ShellState, state,  None
-            | CampaignSelected idx ->
-                let cid = pstate.campaignID
-                let maps =
-                    match cid with
-                    |Some id ->GetMapsList (GetMaps (id.ToString())) |> Seq.toList
-                    |None ->
-                        printfn $"No campaign selected"
-                        List.empty
-                {shellState with
-                    mapID = None
-                } :> ShellState, { state with Maps = maps },  None
-            
-            
-                
+    let  loadMapImage(url: string) : Task<Bitmap option> =
+        task {
+            use httpClient = new HttpClient()
+            try
+                let! response = httpClient.GetAsync(url)
+                if response.IsSuccessStatusCode then
+                    use! stream = response.Content.ReadAsStreamAsync()
+                    return Some(Bitmap(stream))
+                else
+                    return None
+            with
+            | _ -> return None
+        }
         
+        
+        
+    let update (msg: ShellMsg) (pstate: ShellState) (state: IPluginState) :
+        ShellState * IPluginState * Cmd<obj> option =
+        let shellState = pstate
+        let state = state :?> MapsState
+        match msg with
+        | PluginMsg pmsg  ->
+          match pmsg with
+          | :? MapsMsg as mapsMsg ->
+            match mapsMsg with           
+            | LoadImage url ->               
+                shellState, state, None
+            | ImageLoaded bitmap ->
+                let newState = { state with
+                                    CurrentMapImg = Some bitmap
+                                    Owner = pstate.campaignID}
+                shellState, newState :> IPluginState, None
+        | MapSelected index ->
+            match index with
+            |idx when (idx>=0) ->               
+                let url = state.Maps[index].image_full // Replace with your URL
+                
+                let cmd =
+                    Cmd.OfAsync.perform (fun () ->
+                        async {
+                            let! bitmapOpt = loadMapImage url |> Async.AwaitTask
+                            match bitmapOpt with
+                            | Some bitmap ->
+                                printfn "Image loaded successfully"
+                                return PluginMsg (ImageLoaded bitmap) :> obj
+                            | None ->
+                                printfn "Image load failed"
+                                return PluginMsg (ImageLoadFailed url) :> obj
+                        }) ()
+                // Dispatch the LoadImage message
+                shellState, state, Some cmd
+            | _ -> shellState, state, None         
+        | CampaignSelected idx ->
+            let cid = pstate.campaignID
+            let maps =
+                match cid with
+                |Some id ->GetMapsList (GetMaps (id.ToString())) |> Seq.toList
+                |None ->
+                    printfn $"No campaign selected"
+                    List.empty
+            {shellState with
+                mapID = None
+            } :> ShellState, { state with Maps = maps },  None   
+                
+     
     let view (pState:ShellState) (state: MapsState) (dispatch   ) : Types.IView=
            //printfn $"Maps Count view {state.Maps |> Seq.length}"
-       let names =
+       let mapTuples =
                 (state.Maps)
                  |> Seq.map (
                          fun c ->
-                             c.name)                      
+                             (c.name,c.image_full))                      
                  |> Seq.toList
        Grid.create [
         Grid.children [
@@ -102,18 +146,17 @@ module Maps =
 
             // ComboBox overlaid at the top-left
             ComboBox.create [
-                ComboBox.dataItems names
+                ComboBox.dataItems
+                    (mapTuples |> List.map (fun (name, _) -> name))
                 ComboBox.onSelectedIndexChanged (fun index ->
-                    match index with
-                    |index when index >= 0 -> dispatch (MapSelected index) 
-                    | _ -> printfn "Invalid index value"
+                        dispatch (MapSelected index)
                 )
                 Grid.row 0
                 Grid.column 0
                 ComboBox.margin (10.0, 10.0, 0.0, 0.0) // Adjust margin as needed
                 Panel.zIndex 1 // Ensure ComboBox is overlaid
                 ComboBox.width 150.0 // Optional: Set width
-            ]
+           ]
         ]
     ]
        

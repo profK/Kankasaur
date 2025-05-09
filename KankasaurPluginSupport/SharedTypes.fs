@@ -12,7 +12,7 @@ type IPluginState= interface end
 
 
 type ShellMsg =
-    |  PluginMsg of IPluginMsg
+    | PluginMsg of IPluginMsg
     | CampaignSelected of int
     | MapSelected of int
     
@@ -29,7 +29,7 @@ and ShellState = {
 and  IPlugin = 
         abstract member Init : ShellState-> ShellState* IPluginState
         abstract member Update : ShellMsg -> ShellState -> IPluginState->
-            ShellState * IPluginState *ShellMsg option
+            ShellState * IPluginState * Cmd<obj> option
         abstract member View : ShellState->IPluginState -> (obj -> unit) -> Types.IView
 
     
