@@ -1,9 +1,12 @@
 ﻿namespace MapsPlugin
 
+open System.IO
 open System.Net.Http
-open System.Threading.Tasks
 
 open System.Text.Json
+open Avalonia.FuncUI.Types
+open Avalonia.Threading
+open System.Threading.Tasks
 open Elmish
 open Avalonia.FuncUI
 open Avalonia.FuncUI.DSL
@@ -60,15 +63,21 @@ module Maps =
     let  loadMapImage(url: string) : Task<Bitmap option> =
         task {
             use httpClient = new HttpClient()
-            try
-                let! response = httpClient.GetAsync(url)
-                if response.IsSuccessStatusCode then
-                    use! stream = response.Content.ReadAsStreamAsync()
-                    return Some(Bitmap(stream))
-                else
-                    return None
-            with
-            | _ -> return None
+        //    try
+            let! response = httpClient.GetAsync(url)
+            match response.IsSuccessStatusCode with
+            | true ->
+                use! stream = response.Content.ReadAsStreamAsync()
+                let! bitmap =
+                        Dispatcher.UIThread
+                            .InvokeAsync(fun () -> Bitmap(stream))
+                            .GetTask()
+                        |> Async.AwaitTask
+                return Some(bitmap)
+            | false ->
+                return None
+        //    with
+        //        | _ -> return None
         }
         
         
@@ -88,26 +97,31 @@ module Maps =
                 let newState = { state with
                                     CurrentMapImg = Some bitmap
                                     Owner = pstate.campaignID}
+                //set the image to the current map
+                
                 shellState, newState :> IPluginState, None
         | MapSelected index ->
             match index with
             |idx when (idx>=0) ->               
                 let url = state.Maps[index].image_full // Replace with your URL
                 
-                let cmd =
-                    Cmd.OfAsync.perform (fun () ->
-                        async {
-                            let! bitmapOpt = loadMapImage url |> Async.AwaitTask
-                            match bitmapOpt with
-                            | Some bitmap ->
-                                printfn "Image loaded successfully"
-                                return PluginMsg (ImageLoaded bitmap) :> obj
-                            | None ->
-                                printfn "Image load failed"
-                                return PluginMsg (ImageLoadFailed url) :> obj
-                        }) ()
-                // Dispatch the LoadImage message
-                shellState, state, Some cmd
+                let cmd : Cmd<obj> =
+                    Cmd.OfAsync.perform
+                            (fun () ->
+                                async {
+                                    let! bitmapOpt = loadMapImage url |> Async.AwaitTask
+                                    match bitmapOpt with
+                                    | Some bitmap ->
+                                        printfn "Image loaded successfully"
+                                        return PluginMsg (ImageLoaded bitmap)  :> obj
+                                    | None ->
+                                        printfn "Image load failed"
+                                        return PluginMsg (ImageLoadFailed url)  :> obj
+                                })
+                            ()
+                            id  // result is already of type obj, so identity function is fine // map to 'msg type
+                                // Dispatch the LoadImage message
+                shellState, state, Some cmd 
             | _ -> shellState, state, None         
         | CampaignSelected idx ->
             let cid = pstate.campaignID
@@ -134,14 +148,28 @@ module Maps =
         Grid.children [
             // ScrollViewer containing the image
             ScrollViewer.create [
-                ScrollViewer.content (
-                    Image.create [
-                        match state.CurrentMapImg with
-                        | Some img -> Image.source img
-                        | None -> ()
-                        Image.stretch Stretch.Uniform
+         ScrollViewer.content (
+            match state.CurrentMapImg with
+            | Some img ->
+                Image.create [
+                    Image.source img
+                    Image.stretch Stretch.Uniform
+                ] :> IView
+            | None ->
+                DockPanel.create [
+                    DockPanel.lastChildFill true
+                    DockPanel.children [
+                        TextBlock.create [
+                            TextBlock.text "No map loaded"
+                            TextBlock.horizontalAlignment HorizontalAlignment.Center
+                            TextBlock.verticalAlignment VerticalAlignment.Center
+                            TextBlock.textAlignment TextAlignment.Center
+                            TextBlock.fontSize 24.0
+                        ]
                     ]
-                )
+                ]:> IView
+        )
+
             ]
 
             // ComboBox overlaid at the top-left

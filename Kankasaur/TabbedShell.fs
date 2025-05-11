@@ -87,18 +87,23 @@ let update (msg: obj) (state: ShellState): ShellState * Cmd<_> =
         let newState, newPlugins, cmdList =
             state.plugins
             |> List.fold (fun state pluginRec ->
-                let appState,  pluginRecList, msgList = state
+                let appState,  pluginRecList, cmdList = state
                 let appState, newState, msgOpt = pluginRec.Instance.Update shellMsg appState pluginRec.State
 
                 let newPlugin = {pluginRec with State = newState}
                 let cmdList = 
                     match msgOpt with
-                    | Some cmd -> cmd :: msgList
-                    | None -> msgList
-                appState, newPlugin::pluginRecList,  msgList
+                    | Some cmd -> cmd :: cmdList
+                    | None -> cmdList
+                appState, newPlugin::pluginRecList,  cmdList
                 ) (state, [], [ ])
         //printfn "Plugins after update %A" newPlugins
-        {newState with plugins = (newPlugins |> List.rev)}, Cmd.batch cmdList
+        
+        {newState with plugins = (newPlugins |> List.rev)},
+        if cmdList.Length > 0 then
+            Cmd.batch cmdList
+        else
+            Cmd.none
     | _ ->      
         // Handle other messages
         printfn "Unhandled message: %A" msg
